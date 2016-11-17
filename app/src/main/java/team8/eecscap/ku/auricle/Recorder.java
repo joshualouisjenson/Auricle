@@ -1,4 +1,4 @@
-package auricle.bufferedaudio;
+package team8.eecscap.ku.auricle;
 
 import java.io.*;
 
