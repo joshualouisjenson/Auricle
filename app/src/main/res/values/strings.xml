@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Auricle</string>
+
+    <!-- Menu -->
+    <string name="action_about">About</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Snackbar -->
+    <string name="record_start_message">Now recording</string>
+    <string name="record_stop_message">Recording paused</string>
+</resources>
