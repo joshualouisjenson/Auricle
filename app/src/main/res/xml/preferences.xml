@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:key="pref_cat_general"
+        android:title="@string/preference_category_general">
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pref_cat_general"
+        android:title="@string/preference_category_data">
+        <ListPreference
+            android:key="pref_data_buffer_length"
+            android:title="@string/preference_data_buffer_length"
+            android:dialogTitle="@string/preference_data_buffer_length_dialog"
+            android:entries="@array/preference_data_buffer_length_names"
+            android:entryValues="@array/preference_data_buffer_length_values"
+            android:defaultValue=""/>
+    </PreferenceCategory>
+
+</PreferenceScreen>
