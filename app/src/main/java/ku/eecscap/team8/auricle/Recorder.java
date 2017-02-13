@@ -1,9 +1,12 @@
-package team8.eecscap.ku.auricle;
+package ku.eecscap.team8.auricle;
 
+import android.app.Application;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.app.Activity;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import java.io.BufferedOutputStream;
@@ -21,36 +24,39 @@ import java.util.Map;
  * Last Modified by Joshua Jenson on 2/2/2017.
  */
 
-public class Recorder extends AppCompatActivity {
+public class Recorder {
     /*=============================================================================
     =============================== Class Variables ===============================
     =============================================================================*/
     private AudioRecord recorder;
     private Thread activeThread;
 
-    private Map<String,String> config = ((Auricle) this.getApplication()).getRecorderConfig();
-    private SimpleDateFormat autoDateFormat = new SimpleDateFormat(config.get("dateFormat"));
-    private String errorMessage = config.get("errorMessage");
-    private String saveFileFolder = config.get("saveFileFolder");
-    private String saveFileName = config.get("saveFileName");
-    private String saveFileType = config.get("saveFileType");
-    private int bufferSizeInMB = Integer.parseInt(config.get("bufferSizeInMB"));
-    private int bytesPerFrame = Integer.parseInt(config.get("bytesPerFrame"));
+    private Auricle app;
+    private Map<String,String> config;
+    private SimpleDateFormat autoDateFormat;
+    private String errorMessage;
+    private String saveFileFolder;
+    private String saveFileName;
+    private String saveFileType;
+    private int bufferSizeInMB;
+    private int bytesPerFrame;
 
-    private int bufferSize =  bufferSizeInMB*(1024^2);
-    private int framesToRecord = bufferSize / bytesPerFrame;
+    private int bufferSize;
 
     /*=============================================================================
     =================================== Methods ===================================
     =============================================================================*/
-    public Recorder() {
 
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public Recorder(Auricle app) {
+        this.app = app;
+        this.config = app.getRecorderConfig();
+        this.autoDateFormat = new SimpleDateFormat(config.get("dateFormat"));
+        this.saveFileFolder = config.get("saveFileFolder");
+        this.saveFileName = config.get("saveFileName");
+        this.saveFileType = config.get("saveFileType");
+        this.bufferSizeInMB = Integer.parseInt(config.get("bufferSizeInMB"));
+        this.bytesPerFrame = Integer.parseInt(config.get("bytesPerFrame"));
+        this.bufferSize =  bufferSizeInMB*(1024^2);
     }
 
     /*
@@ -58,11 +64,10 @@ public class Recorder extends AppCompatActivity {
     */
     protected void start(){
         // Initialize recorder object
-        // === these should be replaced by a method inside Main which calls start and sets the options there ===
-        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, 44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
+        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, 44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, (1*(1024^2)));
 
         recorder.startRecording();
-        ((Auricle) this.getApplication()).setRecordingState(true);
+        app.setRecordingState(true);
 
         activeThread = new Thread(new Runnable() {
             public void run() {
@@ -79,7 +84,7 @@ public class Recorder extends AppCompatActivity {
     private void readAndWrite(){
         try {
             String saveFilePath = getSaveFilePath();
-            byte byteBuf[] = new byte[32];
+            byte byteBuf[] = new byte[8];
 
             File f = new File(saveFilePath);
             if (!f.exists())
@@ -92,9 +97,9 @@ public class Recorder extends AppCompatActivity {
             FileOutputStream output = null;
             output = new FileOutputStream(saveFilePath);
 
-            while (((Auricle) this.getApplication()).getRecordingState()) {
-                recorder.read(byteBuf, 0, 32);
-                output.write(byteBuf, 0, 32);
+            while (app.getRecordingState()) {
+                recorder.read(byteBuf, 0, 8);
+                output.write(byteBuf, 0, 8);
             }
 
             output.close();
@@ -113,13 +118,9 @@ public class Recorder extends AppCompatActivity {
         }
     }
 
-    protected String getErrorMessage() {
-        return this.errorMessage;
-    }
-
     private String getSaveFilePath() {
-        String currentDateandTime = autoDateFormat.format(new Date());
-        String saveFilePath = saveFileFolder + saveFileName + currentDateandTime + saveFileType;
+        String currentDateAndTime = autoDateFormat.format(new Date());
+        String saveFilePath = saveFileFolder + saveFileName + currentDateAndTime + saveFileType;
         return saveFilePath;
     }
 

@@ -1,4 +1,4 @@
-package team8.eecscap.ku.auricle;
+package ku.eecscap.team8.auricle;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
