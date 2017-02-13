@@ -84,7 +84,7 @@ public class Recorder {
     private void readAndWrite(){
         try {
             String saveFilePath = getSaveFilePath();
-            byte byteBuf[] = new byte[8];
+            byte byteBuf[] = new byte[32];
 
             File f = new File(saveFilePath);
             if (!f.exists())
@@ -98,8 +98,8 @@ public class Recorder {
             output = new FileOutputStream(saveFilePath);
 
             while (app.getRecordingState()) {
-                recorder.read(byteBuf, 0, 8);
-                output.write(byteBuf, 0, 8);
+                recorder.read(byteBuf, 0, 32);
+                output.write(byteBuf, 0, 32);
             }
 
             output.close();
