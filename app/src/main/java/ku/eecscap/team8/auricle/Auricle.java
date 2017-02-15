@@ -1,10 +1,12 @@
-package team8.eecscap.ku.auricle;
+package ku.eecscap.team8.auricle;
 
-/**
+/*
  * Created by Joshua Jenson on 2/2/2017.
  */
 
 import android.app.Application;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +21,7 @@ public class Auricle extends Application {
     private String recorderBufferSizeInMB = "1";
 
     protected boolean startRecording(){
-        recorder = new Recorder();
+        recorder = new Recorder(this);
         recorder.start();
         return true;
     }
@@ -37,13 +39,12 @@ public class Auricle extends Application {
         return isRecording;
     }
 
-    protected Map<String,String> getRecorderConfig() {
+    public Map<String,String> getRecorderConfig() {
         String[][] recorderConfigData = new String[][]{
                 {"saveFileFolder", recorderSaveFileFolder},
                 {"saveFileName", recorderSaveFileName},
                 {"saveFileType", recorderSaveFileFormat},
                 {"bufferSizeInMB", recorderBufferSizeInMB},
-                {"errorMessage", "There was a problem while trying to record. Sorry!"},
                 {"dateFormat", "yyyyMMdd_HHmmss"},
                 {"bytesPerFrame", "2"} // 2 bytes in 16bit format}
         };
