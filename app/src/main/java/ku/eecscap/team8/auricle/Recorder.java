@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * Created by Joshua Jenson on 11/10/2016.
@@ -38,10 +39,9 @@ public class Recorder {
     private String saveFileFolder;
     private String saveFileName;
     private String saveFileType;
-    private int bufferSizeInMB;
     private int bytesPerFrame;
-
     private int bufferSize;
+    private Vector<File> tempFiles = new Vector<File>();
 
     /*=============================================================================
     =================================== Methods ===================================
@@ -54,9 +54,8 @@ public class Recorder {
         this.saveFileFolder = config.get("saveFileFolder");
         this.saveFileName = config.get("saveFileName");
         this.saveFileType = config.get("saveFileType");
-        this.bufferSizeInMB = Integer.parseInt(config.get("bufferSizeInMB"));
+        this.bufferSize = Integer.parseInt(config.get("bufferSizeInMB"))*(1024^2);
         this.bytesPerFrame = Integer.parseInt(config.get("bytesPerFrame"));
-        this.bufferSize =  bufferSizeInMB*(1024^2);
     }
 
     /*
@@ -64,7 +63,7 @@ public class Recorder {
     */
     protected void start(){
         // Initialize recorder object
-        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, 44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, (1*(1024^2)));
+        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, 44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
 
         recorder.startRecording();
         app.setRecordingState(true);
@@ -93,6 +92,7 @@ public class Recorder {
                 f.delete();
                 f.getParentFile().mkdirs();
             }
+            tempFiles.add(f);
 
             FileOutputStream output = null;
             output = new FileOutputStream(saveFilePath);
@@ -108,6 +108,12 @@ public class Recorder {
         } catch (Exception e) {
             String message = "Error while recording: " + e.getMessage();
             //do something
+        }
+
+        if(!tempFiles.isEmpty()) {
+            for (File toDelete : tempFiles) {
+                toDelete.delete();
+            }
         }
 
         if (recorder != null) {
