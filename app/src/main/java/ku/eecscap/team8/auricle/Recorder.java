@@ -35,7 +35,6 @@ public class Recorder {
     private Map<String,String> config;
     private SimpleDateFormat autoDateFormat;
     private String errorMessage;
-    private String saveFileFolder;
     private String saveFileName;
     private String saveFileType;
     private int bufferSizeInMB;
@@ -51,7 +50,6 @@ public class Recorder {
         this.app = app;
         this.config = app.getRecorderConfig();
         this.autoDateFormat = new SimpleDateFormat(config.get("dateFormat"));
-        this.saveFileFolder = config.get("saveFileFolder");
         this.saveFileName = config.get("saveFileName");
         this.saveFileType = config.get("saveFileType");
         this.bufferSizeInMB = Integer.parseInt(config.get("bufferSizeInMB"));
@@ -83,19 +81,10 @@ public class Recorder {
     */
     private void readAndWrite(){
         try {
-            String saveFilePath = getSaveFilePath();
+            String saveFileName = "temp.pcm";
             byte byteBuf[] = new byte[32];
 
-            File f = new File(saveFilePath);
-            if (!f.exists())
-                f.getParentFile().mkdirs();
-            else if (f.isDirectory()) {
-                f.delete();
-                f.getParentFile().mkdirs();
-            }
-
-            FileOutputStream output = null;
-            output = new FileOutputStream(saveFilePath);
+            FileOutputStream output = app.openFileOutput(saveFileName,Context.MODE_PRIVATE);
 
             while (app.getRecordingState()) {
                 recorder.read(byteBuf, 0, 32);
@@ -104,7 +93,7 @@ public class Recorder {
 
             output.close();
 
-            saveRecording(f);
+            saveRecording(saveFileName);
         } catch (Exception e) {
             String message = "Error while recording: " + e.getMessage();
             //do something
@@ -118,97 +107,145 @@ public class Recorder {
         }
     }
 
-    private String getSaveFilePath() {
+    private String getSaveFileName() {
         String currentDateAndTime = autoDateFormat.format(new Date());
-        String saveFilePath = saveFileFolder + saveFileName + currentDateAndTime + saveFileType;
+        String saveFilePath = saveFileName + currentDateAndTime + saveFileType;
         return saveFilePath;
     }
 
-    private void saveRecording(File file) {
+    private void saveRecording(String file) {
         switch (saveFileType) {
             case ".wav":
-                properWAV(file);
+                internalWAV(file);
+                getFileList();/////////////////////////////////TEMP////////////////////
                 break;
             default:
-                properWAV(file);
+                internalWAV(file);
+                getFileList();//////////////////////////////////TEMP//////////////////////
                 break;
         }
     }
 
-    // reimplement this, borrowed from https://stackoverflow.com/questions/9179536/writing-pcm-recorded-data-into-a-wav-file-java-android
-    private void properWAV(File fileToConvert){
-        long mySubChunk1Size = 16;
-        int myBitsPerSample= 16;
-        int myFormat = 1;
-        long myChannels = 1;
-        long mySampleRate = 44100;
-        long myByteRate = mySampleRate * myChannels * myBitsPerSample/8;
-        int myBlockAlign = (int) (myChannels * myBitsPerSample/8);
+    private void internalWAV(String file) {
+        //Save the wav file to internal storage
+        //Set local constants
+        int subChunkSize = 16;
+        short bitsPerSample = 16;
+        short format = 1;
+        short numChannels = 1;
+        int sampleRate = 44100;
 
-        byte[] clipData = getBytesFromFile(fileToConvert);
+        //Get the byte rate from the constants
+        short bytesPerSample = (short) (numChannels*bitsPerSample/8);
+        int byteRate = bytesPerSample*sampleRate;
 
-        long myDataSize = clipData.length;
-        long myChunk2Size =  myDataSize * myChannels * myBitsPerSample/8;
-        long myChunkSize = 36 + myChunk2Size;
+        //Get file length
+        int dataLength = (int) new File(app.getFilesDir().getAbsolutePath()+"/" + file).length();
+        int fileLength = dataLength*numChannels*bitsPerSample/2+36;//36bytes for header
 
-        OutputStream os;
+        String filename = getSaveFileName();
+
         try {
-            os = new FileOutputStream(new File(getSaveFilePath()));
-            BufferedOutputStream bos = new BufferedOutputStream(os);
-            DataOutputStream outFile = new DataOutputStream(bos);
+            //Create a file output stream for writing the file
+            FileOutputStream os = app.openFileOutput(filename,Context.MODE_PRIVATE);
+            //Create a file input stream for reading from the temp file
+            FileInputStream localFileStream = app.openFileInput(file);
 
-            outFile.writeBytes("RIFF");                                 // 00 - RIFF
-            outFile.write(intToByteArray((int) myChunkSize), 0, 4);      // 04 - how big is the rest of this file?
-            outFile.writeBytes("WAVE");                                 // 08 - WAVE
-            outFile.writeBytes("fmt ");                                 // 12 - fmt
-            outFile.write(intToByteArray((int) mySubChunk1Size), 0, 4);  // 16 - size of this chunk
-            outFile.write(shortToByteArray((short) myFormat), 0, 2);     // 20 - what is the audio format? 1 for PCM = Pulse Code Modulation
-            outFile.write(shortToByteArray((short) myChannels), 0, 2);   // 22 - mono or stereo? 1 or 2?  (or 5 or ???)
-            outFile.write(intToByteArray((int) mySampleRate), 0, 4);     // 24 - samples per second (numbers per second)
-            outFile.write(intToByteArray((int) myByteRate), 0, 4);       // 28 - bytes per second
-            outFile.write(shortToByteArray((short) myBlockAlign), 0, 2); // 32 - # of bytes in one sample, for all channels
-            outFile.write(shortToByteArray((short) myBitsPerSample), 0, 2);  // 34 - how many bits in a sample(number)?  usually 16 or 24
-            outFile.writeBytes("data");                                 // 36 - data
-            outFile.write(intToByteArray((int) myDataSize), 0, 4);       // 40 - how big is this data chunk
-            outFile.write(clipData);                                    // 44 - the actual data itself - just a long string of numbers
+            //Write the file header for the wave format
+            os.write("RIFF".getBytes());                //Chunk ID
+            os.write(intToByteArray(fileLength));       //Chunk Size
+            os.write("WAVE".getBytes());                //Format
+            os.write("fmt ".getBytes());                //SubChunk1 ID
+            os.write(intToByteArray(subChunkSize));     //SubChunk1 Size
+            os.write(shortToByteArray(format));         //Audio Format
+            os.write(shortToByteArray(numChannels));    //Num Channels
+            os.write(intToByteArray(sampleRate));       //Sample Rate
+            os.write(intToByteArray(byteRate));         //Byte Rate
+            os.write(shortToByteArray(bytesPerSample)); //Block Align
+            os.write(shortToByteArray(bitsPerSample));  //Bits per sample
+            os.write("data".getBytes());                //SubChunk2 ID
+            os.write(intToByteArray(dataLength));       //SubChunk2 Length
 
-            outFile.flush();
-            outFile.close();
+            //write the data by retrievinng the temp file's data
+            byte[] buf = new byte[256];//buffer of length 256 I guess
+            int bytesRead = 0;
+            while(bytesRead >= 0)
+            {
+                //Read data from the internal file
+                bytesRead = localFileStream.read(buf);//returns -1 if EOF
+                //Write that data to the external file
+                os.write(buf);
+            }
+
+            os.close();
+
         } catch(Exception e) {
             String message = "Error while saving .wav file: " + e.getMessage();
             //do something
         }
     }
 
-    //re-implement, from https://stackoverflow.com/questions/10039672/android-how-to-read-file-in-bytes
-    private byte[] getBytesFromFile (File file)
-    {
-        FileInputStream input = null;
-        if (file.exists()) try
-        {
-            input = new FileInputStream (file);
-            int len = (int) file.length();
-            byte[] data = new byte[len];
-            int count, total = 0;
-            while ((count = input.read (data, total, len - total)) > 0) total += count;
-            return data;
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-        finally
-        {
-            if (input != null) try
-            {
-                input.close();
+    //Provides an external file with the list of locally stored items
+    private void getFileList(){
+        String[] test = app.fileList();
+        int numFiles = test.length;
+        //Write internal files to external file
+        try {
+            //Create the Auricle Directory if it doesnt already exist
+            File auricleDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"Auricle/");
+            auricleDirectory.mkdir();
+
+            //Create the file output stream
+            File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"Auricle/files.txt");
+            FileOutputStream os = new FileOutputStream(externalFile);
+
+            //Create the file
+            for(int i=0; i<numFiles; i++){
+                //Write file number : filename - file size in KB
+                int dataLength = (int) new File(app.getFilesDir().getAbsolutePath()+"/" + test[i]).length()/1024;
+                os.write((Integer.toString(i)+": "+test[i]+" - " + Integer.toString(dataLength)+"\n").getBytes());
             }
-            catch (Exception ex)
-            {
-                ex.printStackTrace();
-            }
+            os.close();
+
+
+        } catch(Exception e){
+            String message = "Error while saving .wav file: " + e.getMessage();
         }
-        return null;
+
+        //export most recent file to external with name "tested.wav"
+        exportLocalFile(test[numFiles-1]);//////////////////////////////////TEMP/////////////////////////////////////
+    }
+
+    //Exports a local file (specified by local filename) to the external Auricle directory
+    private void exportLocalFile(String localFilename){
+        try {
+            //Open the local file stream
+            FileInputStream localFileStream = app.openFileInput(localFilename);
+
+            //Create the Auricle Directory if it doesnt already exist
+            File auricleDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"Auricle/");
+            auricleDirectory.mkdir();
+            //Create the external file
+            File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"Auricle/external.wav");
+
+            //Create the external file stream
+            FileOutputStream os = new FileOutputStream(externalFile);
+            byte[] buf = new byte[256];//buffer of length 64 I guess
+            int bytesRead = 0;
+            while(bytesRead >= 0)
+            {
+                //Read data from the internal file
+                bytesRead = localFileStream.read(buf);
+                //Write that data to the external file
+                os.write(buf);
+            }
+
+            localFileStream.close();
+            os.close();
+
+        } catch(Exception e){
+            String message = "Error while exporting file: " + e.getMessage();
+        }
     }
 
 
