@@ -15,7 +15,6 @@ public class Auricle extends Application {
 
     private Recorder recorder;
     private boolean isRecording = false;
-    private String recorderSaveFileFolder = "/sdcard/";
     private String recorderSaveFileFormat = ".wav";
     private String recorderSaveFileName = "AuricleRecording_";
     private String recorderBufferSizeInMB = "1";
@@ -41,7 +40,6 @@ public class Auricle extends Application {
 
     public Map<String,String> getRecorderConfig() {
         String[][] recorderConfigData = new String[][]{
-                {"saveFileFolder", recorderSaveFileFolder},
                 {"saveFileName", recorderSaveFileName},
                 {"saveFileType", recorderSaveFileFormat},
                 {"bufferSizeInMB", recorderBufferSizeInMB},
