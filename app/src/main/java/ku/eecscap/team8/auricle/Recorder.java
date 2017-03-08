@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * Created by Joshua Jenson on 11/10/2016.
- * Last Modified by Joshua Jenson on 2/2/2017.
+ * Last Modified by Jake Kennedy on on 3/7/2017.
  */
 
 public class Recorder {
@@ -83,19 +83,35 @@ public class Recorder {
     */
     private void readAndWrite(){
         try {
-            String saveFileName = "temp.pcm";
-            byte byteBuf[] = new byte[32];
+            byte byteBuf[] = new byte[128];
 
-            FileOutputStream output = app.openFileOutput(saveFileName,Context.MODE_PRIVATE);
-
-            while (app.getRecordingState()) {
-                recorder.read(byteBuf, 0, 32);
-                output.write(byteBuf, 0, 32);
+            boolean done = false;
+            boolean looped = false;
+            int i=0;
+            while(!done) {
+                //Iterate through each temp file from temp1.pcm to temp20.pcm, then cycle back
+                i++;
+                String tempName = "temp"+Integer.toString(i)+".pcm";
+                FileOutputStream os = app.openFileOutput(tempName,Context.MODE_PRIVATE);
+                int written = 0;
+                while (app.getRecordingState() && written<(88200*2)) {
+                    recorder.read(byteBuf, 0, 128);
+                    os.write(byteBuf,0,128);
+                    written += 128;
+                }
+                os.close();
+                if( !app.getRecordingState() ){
+                    done = true;//Stopped Recording
+                }else if(i==20){
+                    //Still Recording and finished writing temp20.pcm, set i = 0 so next file is temp1.pcm
+                    i=0;
+                    looped = true;//Flag set so we know that the entire buffer is used
+                }
             }
+            
+            mergeBuf(looped,i);
 
-            output.close();
-
-            saveRecording(saveFileName);
+            saveRecording("temp.pcm");
         } catch (Exception e) {
             String message = "Error while recording: " + e.getMessage();
             //do something
@@ -108,6 +124,52 @@ public class Recorder {
             activeThread = null;
         }
     }
+
+    private void mergeBuf(boolean looped, int end){
+        //Now loop over every one
+        try {
+            //Open the local file stream
+            int start;
+            if(looped){
+                start = (end % 20) + 1;
+            }else{
+                start = 1;
+            }
+
+            String externalFile = "temp.pcm";// + Integer.toString(25) + ".pcm";
+            FileOutputStream os = app.openFileOutput(externalFile, Context.MODE_PRIVATE);
+
+
+            FileInputStream localFileStream;
+            boolean done = false;
+            while(!done) {
+                String name = "temp" + Integer.toString(start) + ".pcm";
+                localFileStream = app.openFileInput(name);
+                
+                byte[] buf = new byte[128];//buffer of length 256 I guess
+                int bytesRead = 0;
+                while (bytesRead >= 0) {
+                    //Read data from the internal tempI.pcm file
+                    bytesRead = localFileStream.read(buf, 0, 128);
+                    //Write that data to the temp.pcm file
+                    os.write(buf, 0, 128);
+                }
+
+                localFileStream.close();
+                if(start != end){
+                    start = (start % 20) + 1;//set start to next int in the circular buffer
+                }else{
+                    done = true;//Done copying files
+                }
+            }
+
+            os.close();
+
+        } catch(Exception e){
+            String message = "Error while exporting file: " + e.getMessage();
+        }
+    }
+
 
     private String getSaveFileName() {
         String currentDateAndTime = autoDateFormat.format(new Date());
@@ -174,12 +236,20 @@ public class Recorder {
             while(bytesRead >= 0)
             {
                 //Read data from the internal file
-                bytesRead = localFileStream.read(buf);//returns -1 if EOF
+                bytesRead = localFileStream.read(buf,0,256);//returns -1 if EOF
                 //Write that data to the external file
-                os.write(buf);
+                os.write(buf,0,256);
             }
 
             os.close();
+
+            //Delete temp files
+            /*for(int i=0;i<20;i++){
+                String tempName = "temp"+Integer.toString(i)+".pcm";
+                String dir = app.getFilesDir().getAbsolutePath();
+                File f = new File(dir,tempName);
+                f.delete();
+            }*/
 
         } catch(Exception e) {
             String message = "Error while saving .wav file: " + e.getMessage();
@@ -204,7 +274,7 @@ public class Recorder {
             //Create the file
             for(int i=0; i<numFiles; i++){
                 //Write file number : filename - file size in KB
-                int dataLength = (int) new File(app.getFilesDir().getAbsolutePath()+"/" + test[i]).length()/1024;
+                int dataLength = (int) new File(app.getFilesDir().getAbsolutePath()+"/" + test[i]).length();//Prints of length in Bytes
                 os.write((Integer.toString(i)+": "+test[i]+" - " + Integer.toString(dataLength)+"\n").getBytes());
             }
             os.close();
@@ -232,7 +302,7 @@ public class Recorder {
 
             //Create the external file stream
             FileOutputStream os = new FileOutputStream(externalFile);
-            byte[] buf = new byte[256];//buffer of length 64 I guess
+            byte[] buf = new byte[256];//buffer of length 256 I guess
             int bytesRead = 0;
             while(bytesRead >= 0)
             {
