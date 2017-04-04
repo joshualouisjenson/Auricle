@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * Created by Joshua Jenson on 11/10/2016.
- * Last Modified by Jake Kennedy on on 3/7/2017.
+ * Last Modified by Austin Kurtti on on 4/3/2017.
  */
 
 public class Recorder {
@@ -110,8 +110,6 @@ public class Recorder {
             }
             
             mergeBuf(looped,i);
-
-            saveRecording("temp.pcm");
         } catch (Exception e) {
             String message = "Error while recording: " + e.getMessage();
             //do something
@@ -177,7 +175,7 @@ public class Recorder {
         return saveFilePath;
     }
 
-    private void saveRecording(String file) {
+    public void saveRecording(String file) {
         switch (saveFileType) {
             case ".wav":
                 internalWAV(file);
