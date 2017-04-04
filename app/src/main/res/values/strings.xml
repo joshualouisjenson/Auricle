@@ -10,6 +10,11 @@
     <string name="record_start_message">Now recording</string>
     <string name="record_stop_message">Recording paused</string>
 
+    <!-- Dialogs -->
+    <string name="post_record_dialog_title">Save clip</string>
+    <string name="post_record_filename">Filename</string>
+    <string name="save">Save</string>
+
     <!-- Preferences -->
     <string name="preference_category_general">General</string>
     <string name="preference_category_data">Data</string>

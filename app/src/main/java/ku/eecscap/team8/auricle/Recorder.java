@@ -111,7 +111,7 @@ public class Recorder {
             
             mergeBuf(looped,i);
 
-            saveRecording("temp.pcm");
+//            saveRecording("temp.pcm");
         } catch (Exception e) {
             String message = "Error while recording: " + e.getMessage();
             //do something
@@ -177,7 +177,7 @@ public class Recorder {
         return saveFilePath;
     }
 
-    private void saveRecording(String file) {
+    public void saveRecording(String file) {
         switch (saveFileType) {
             case ".wav":
                 internalWAV(file);

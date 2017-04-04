@@ -30,6 +30,10 @@ public class Auricle extends Application {
         return true;
     }
 
+    public void saveRecordingAs(String file) {
+        recorder.saveRecording(file);
+    }
+
     protected void setRecordingState(boolean state) {
         isRecording = state;
     }

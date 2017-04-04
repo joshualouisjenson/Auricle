@@ -2,7 +2,7 @@ package ku.eecscap.team8.auricle;
 
 /**
  * Created by Austin Kurtti
- * Modified by Joshua Jenson on 2/2/2017.
+ * Modified by Austin Kurtti on 4/3/2017.
  */
 
 import android.content.Intent;
@@ -17,6 +17,8 @@ import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
+    Auricle app;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AgreeTerms agreement = new AgreeTerms(this);
@@ -25,27 +27,36 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        app = (Auricle) this.getApplication();
     }
 
     public void toggleRecording(View view) {
         int newImage;
         String message;
-        boolean successful;
+        boolean successful, paused;
 
         if(((Auricle) this.getApplication()).getRecordingState()) {
             newImage = R.drawable.ic_record_24dp;
             message = getResources().getString(R.string.record_stop_message);
-            successful = ((Auricle) this.getApplication()).stopRecording();
+            successful = app.stopRecording();
+            paused = true;
         }
         else {
             newImage = R.drawable.ic_record_stop_24dp;
             message = getResources().getString(R.string.record_start_message);
-            successful = ((Auricle) this.getApplication()).startRecording();
+            successful = app.startRecording();
+            paused = false;
         }
         if(successful) {
             final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
             fab.setImageResource(newImage);
             Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
+
+            // Show post record dialog if recording was paused
+            if(paused) {
+                PostRecord postRecordDialog = new PostRecord(app, this);
+                postRecordDialog.show();
+            }
         }
     }
 
