@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * Created by Joshua Jenson on 11/10/2016.
- * Last Modified by Austin Kurtti on on 4/3/2017.
+ * Last Modified by Jake Kennedy on on 4/4/2017.
  */
 
 public class Recorder {
@@ -110,6 +110,13 @@ public class Recorder {
             }
             
             mergeBuf(looped,i);
+
+            //Temporary test case for file, ignore
+            //int start = 88200*5;
+            //int end = 88200*35;
+            //String trimmedFile = trimFile("temp.pcm",start,end);
+
+            saveRecording("temp.pcm");
         } catch (Exception e) {
             String message = "Error while recording: " + e.getMessage();
             //do something
@@ -168,6 +175,36 @@ public class Recorder {
         }
     }
 
+    //Temporary, not final yet
+    private String trimFile(String fileName, int startByte, int endByte){
+
+        String trimmedFileName = "trimmed_"+fileName;
+        byte byteBuf[] = new byte[128];
+
+        try {
+            FileInputStream localFileStream = app.openFileInput("temp.pcm");
+            FileOutputStream os = app.openFileOutput(trimmedFileName, Context.MODE_PRIVATE);
+            int written = 0;
+            //First read and do nothing with first startByte bytes
+            while (written < startByte) {
+                localFileStream.read(byteBuf, 0, 128);
+                written += 128;
+            }
+
+            //Next read and write the next (endBytes-startBytes) bytes
+            written=0;
+            while(written < (endByte-startByte)){
+                localFileStream.read(byteBuf,0,128);
+                os.write(byteBuf,0,128);
+                written += 128;
+            }
+        }catch(Exception e){
+            String message = "Error while exporting file: " + e.getMessage();
+        }
+
+        deleteLocalFile("temp.pcm");
+        return trimmedFileName;
+    }
 
     private String getSaveFileName() {
         String currentDateAndTime = autoDateFormat.format(new Date());
@@ -241,18 +278,29 @@ public class Recorder {
 
             os.close();
 
-            //Delete temp files
-            /*for(int i=0;i<20;i++){
+            /*//Delete temp files
+            boolean success = true;
+            for(int i=1;i<21 && success;i++){
                 String tempName = "temp"+Integer.toString(i)+".pcm";
-                String dir = app.getFilesDir().getAbsolutePath();
-                File f = new File(dir,tempName);
-                f.delete();
+                success = deleteLocalFile(tempName);
+                //String dir = app.getFilesDir().getAbsolutePath();
+                //File f = new File(dir,tempName);
+                //f.delete();
             }*/
+            //success = deleteLocalFile("trimmed_temp.pcm");
 
         } catch(Exception e) {
             String message = "Error while saving .wav file: " + e.getMessage();
             //do something
         }
+    }
+
+    //Deletes a file located on internal storage
+    private boolean deleteLocalFile(String fName){
+        String baseDir = app.getFilesDir().getAbsolutePath();
+        File f = new File(baseDir, fName);
+        boolean success = f.delete();
+        return success;
     }
 
     //Provides an external file with the list of locally stored items
@@ -283,11 +331,11 @@ public class Recorder {
         }
 
         //export most recent file to external with name "tested.wav"
-        exportLocalFile(test[numFiles-1]);//////////////////////////////////TEMP/////////////////////////////////////
+        exportLocalFileExternal(test[numFiles-1],"externalFileName.wav");//////////////////////////////////TEMP/////////////////////////////////////
     }
 
     //Exports a local file (specified by local filename) to the external Auricle directory
-    private void exportLocalFile(String localFilename){
+    private void exportLocalFileExternal(String localFilename, String externalFileName){
         try {
             //Open the local file stream
             FileInputStream localFileStream = app.openFileInput(localFilename);
@@ -296,7 +344,8 @@ public class Recorder {
             File auricleDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"Auricle/");
             auricleDirectory.mkdir();
             //Create the external file
-            File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"Auricle/external.wav");
+            externalFileName = "Auricle/"+externalFileName;
+            File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),externalFileName);
 
             //Create the external file stream
             FileOutputStream os = new FileOutputStream(externalFile);
