@@ -116,7 +116,8 @@ public class Recorder {
             //int end = 88200*35;
             //String trimmedFile = trimFile("temp.pcm",start,end);
 
-            saveRecording("temp.pcm");
+            //Test function incase popup fails
+            //saveRecording("temp.pcm","export.wav");
         } catch (Exception e) {
             String message = "Error while recording: " + e.getMessage();
             //do something
@@ -212,15 +213,15 @@ public class Recorder {
         return saveFilePath;
     }
 
-    public void saveRecording(String file) {
+    public void saveRecording(String fileToSave, String saveFileName) {
         switch (saveFileType) {
             case ".wav":
-                internalWAV(file);
-                getFileList();/////////////////////////////////TEMP////////////////////
+                internalWAV(fileToSave);
+                getFileList(saveFileName);/////////////////////////////////TEMP////////////////////
                 break;
             default:
-                internalWAV(file);
-                getFileList();//////////////////////////////////TEMP//////////////////////
+                internalWAV(fileToSave);
+                getFileList(saveFileName);//////////////////////////////////TEMP//////////////////////
                 break;
         }
     }
@@ -304,7 +305,7 @@ public class Recorder {
     }
 
     //Provides an external file with the list of locally stored items
-    private void getFileList(){
+    private void getFileList(String exportFileName){
         String[] test = app.fileList();
         int numFiles = test.length;
         //Write internal files to external file
@@ -331,7 +332,7 @@ public class Recorder {
         }
 
         //export most recent file to external with name "tested.wav"
-        exportLocalFileExternal(test[numFiles-1],"externalFileName.wav");//////////////////////////////////TEMP/////////////////////////////////////
+        exportLocalFileExternal(test[numFiles-1],exportFileName);//////////////////////////////////TEMP/////////////////////////////////////
     }
 
     //Exports a local file (specified by local filename) to the external Auricle directory
@@ -384,3 +385,4 @@ public class Recorder {
         return new byte[]{(byte)(data & 0xff),(byte)((data >>> 8) & 0xff)};
     }
 }
+
