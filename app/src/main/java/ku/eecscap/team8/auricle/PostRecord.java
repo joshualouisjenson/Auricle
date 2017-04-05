@@ -13,6 +13,7 @@ import java.util.zip.Inflater;
 
 /**
  * Created by Austin Kurtti on 4/3/2017.
+ * Last Edited by Jake Kennedy on 4/4/2017
  */
 
 public class PostRecord {
@@ -41,7 +42,7 @@ public class PostRecord {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // Save the clip with the entered filename
                         EditText clipFilename = (EditText) dialogView.findViewById(R.id.post_record_clip_filename);
-                        String filename = clipFilename.getText().toString() + ".pcm";
+                        String filename = clipFilename.getText().toString() + ".wav";
                         mApp.saveRecordingAs(filename);
 
                         // Close dialog
