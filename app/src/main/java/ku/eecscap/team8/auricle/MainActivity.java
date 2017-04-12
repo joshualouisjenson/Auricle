@@ -1,8 +1,8 @@
 package ku.eecscap.team8.auricle;
 
 /**
- * Created by Austin Kurtti
- * Modified by Austin Kurtti on 4/3/2017.
+ * Created by Austin Kurtti on 11/16/2016
+ * Modified by Austin Kurtti on 4/3/2017
  */
 
 import android.content.Intent;
