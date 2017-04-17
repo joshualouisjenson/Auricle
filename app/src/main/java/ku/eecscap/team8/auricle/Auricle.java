@@ -2,6 +2,7 @@ package ku.eecscap.team8.auricle;
 
 /*
  * Created by Joshua Jenson on 2/2/2017.
+ * Last Edited by Jake Kennedy on 4/4/2017
  */
 
 import android.app.Application;
@@ -15,7 +16,6 @@ public class Auricle extends Application {
 
     private Recorder recorder;
     private boolean isRecording = false;
-    private String recorderSaveFileFolder = "/sdcard/";
     private String recorderSaveFileFormat = ".wav";
     private String recorderSaveFileName = "AuricleRecording_";
     private String recorderBufferSizeInMB = "1";
@@ -31,6 +31,10 @@ public class Auricle extends Application {
         return true;
     }
 
+    public void saveRecordingAs(String file) {
+        recorder.saveRecording("temp.pcm",file);
+    }
+
     protected void setRecordingState(boolean state) {
         isRecording = state;
     }
@@ -41,7 +45,6 @@ public class Auricle extends Application {
 
     public Map<String,String> getRecorderConfig() {
         String[][] recorderConfigData = new String[][]{
-                {"saveFileFolder", recorderSaveFileFolder},
                 {"saveFileName", recorderSaveFileName},
                 {"saveFileType", recorderSaveFileFormat},
                 {"bufferSizeInMB", recorderBufferSizeInMB},
