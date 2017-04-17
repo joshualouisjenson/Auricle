@@ -235,13 +235,18 @@ public class Recorder {
         return saveFileName + currentDateAndTime + saveFileType;
     }
 
-    protected void saveRecording(String fileToSave, String saveFileName) {
+    protected void saveRecording(String fileToSave, String saveFileName, int leftSeconds, int rightSeconds) {
+        int startByte = sampleRate * (bitsPerSample/8) * leftSeconds;
+        int endByte = sampleRate * (bitsPerSample/8) * rightSeconds;
+
         switch (saveFileType) {
             case ".wav":
+                //trimFile(saveFileName, startByte, endByte);
                 internalWAV(fileToSave);
                 getFileList(saveFileName);/////////////////////////////////TEMP////////////////////
                 break;
             default:
+                //trimFile(saveFileName, startByte, endByte);
                 internalWAV(fileToSave);
                 getFileList(saveFileName);//////////////////////////////////TEMP//////////////////////
                 break;

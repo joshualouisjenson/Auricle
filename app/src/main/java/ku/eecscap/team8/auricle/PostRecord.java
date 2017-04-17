@@ -14,21 +14,23 @@ import android.widget.EditText;
 import com.appyvet.rangebar.IRangeBarFormatter;
 import com.appyvet.rangebar.RangeBar;
 
-import java.util.zip.Inflater;
-
 /**
  * Created by Austin Kurtti on 4/3/2017.
- * Last Edited by Austin Kurtti on 4/12/2017
+ * Last Edited by Austin Kurtti on 4/17/2017
  */
 
 public class PostRecord {
 
     Auricle mApp;
     private Activity mContext;
+    private Utilities utilities;
+
+    int leftSeconds = 0, rightSeconds = 0;
 
     public PostRecord(Auricle app, Activity context) {
         mApp = app;
         mContext = context;
+        utilities = new Utilities();
     }
 
     public void show() {
@@ -44,7 +46,16 @@ public class PostRecord {
         rangeBar.setFormatter(new IRangeBarFormatter() {
             @Override
             public String format(String value) {
-                return value + "%";
+                // Transform seconds value to hh:mm:ss for better readability
+                int seconds = Integer.parseInt(value);
+                return utilities.getTimeFromSeconds(seconds);
+            }
+        });
+        rangeBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
+            @Override
+            public void onRangeChangeListener(RangeBar bar, int lpIndex, int rpIndex, String lpValue, String rpValue) {
+                leftSeconds = lpIndex;
+                rightSeconds = rpIndex;
             }
         });
 
@@ -58,9 +69,22 @@ public class PostRecord {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // Save the clip with the entered filename
-//                        EditText clipFilename = (EditText) dialogView.findViewById(R.id.post_record_filename);
                         String filename = clipFilename.getText().toString() + ".wav";
-                        mApp.saveRecordingAs(filename);
+                        mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
+
+                        // Close dialog
+                        dialogInterface.dismiss();
+
+                        // Restore device orientation detection
+                        mContext.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+                    }
+                })
+                .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // Save the clip with a default filename
+                        String filename = utilities.getTimestampFilename() + ".wav";
+                        mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
 
                         // Close dialog
                         dialogInterface.dismiss();
@@ -70,6 +94,7 @@ public class PostRecord {
                     }
                 });
         final AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 
         // Disable Save button initially; allow valid filename to enable it
