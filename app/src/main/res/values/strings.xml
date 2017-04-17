@@ -19,9 +19,9 @@
     <!-- Preferences -->
     <string name="preference_category_general">General</string>
     <string name="preference_category_data">Data</string>
-    <string name="preference_data_buffer_length">Buffer length</string>
+    <string name="preference_data_buffer_length_title">Buffer length</string>
     <string name="preference_data_buffer_length_dialog">Select a length</string>
-    <string name="preference_data_audio_format">Audio format</string>
+    <string name="preference_data_audio_format_title">Audio format</string>
     <string name="preference_data_audio_format_dialog">Select a format</string>
     <string name="preference_data_voice_text">Voice to text</string>
 </resources>

@@ -2,23 +2,28 @@ package ku.eecscap.team8.auricle;
 
 /*
  * Created by Joshua Jenson on 2/2/2017.
- * Last Edited by Jake Kennedy on 4/4/2017
+ * Last Edited by Joshua Jenson on 4/11/2017
  */
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
+
 public class Auricle extends Application {
 
     private Recorder recorder;
     private boolean isRecording = false;
-    private String recorderSaveFileFormat = ".wav";
-    private String recorderSaveFileName = "AuricleRecording_";
-    private String recorderBufferSizeInMB = "1";
+    private int numChannels = 1;
+    private int bitsPerSample = 16;
+    private int chunkSizeInSeconds = 2;
+    private int sampleRate = 44100;
 
     protected boolean startRecording(){
         recorder = new Recorder(this);
@@ -44,12 +49,17 @@ public class Auricle extends Application {
     }
 
     public Map<String,String> getRecorderConfig() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         String[][] recorderConfigData = new String[][]{
-                {"saveFileName", recorderSaveFileName},
-                {"saveFileType", recorderSaveFileFormat},
-                {"bufferSizeInMB", recorderBufferSizeInMB},
+                //{"useVoiceToText", prefs.getString("voice_text", "false")},
+                {"saveFileName", prefs.getString("save_location", "AuricleRecording_")},
+                {"saveFileType", prefs.getString("audio_format", "m4a")},
+                {"bufferSize", String.valueOf(sampleRate*numChannels*(bitsPerSample/8) * 60*Integer.parseInt(prefs.getString("buffer_length", "30")))},
                 {"dateFormat", "yyyyMMdd_HHmmss"},
-                {"bytesPerFrame", "2"} // 2 bytes in 16bit format}
+                {"sampleRate", String.valueOf(sampleRate)},
+                {"chunkSizeInSeconds", String.valueOf(chunkSizeInSeconds)},
+                {"bitsPerSample", String.valueOf(bitsPerSample)}
         };
         return createConfigMap(recorderConfigData);
     }
