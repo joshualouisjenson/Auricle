@@ -5,6 +5,10 @@ import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.media.audiofx.AcousticEchoCanceler;
+import android.media.audiofx.AutomaticGainControl;
+import android.media.audiofx.NoiseSuppressor;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
 import android.os.Environment;
@@ -73,6 +77,12 @@ public class Recorder {
 
         // Initialize recorder object
         recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, audioRecordBufferSize);
+
+        if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            if(AcousticEchoCanceler.isAvailable()) AcousticEchoCanceler.create(recorder.getAudioSessionId());
+            if(NoiseSuppressor.isAvailable()) NoiseSuppressor.create(recorder.getAudioSessionId());
+            if(AutomaticGainControl.isAvailable()) AutomaticGainControl.create(recorder.getAudioSessionId());
+        }
 
         recorder.startRecording();
         app.setRecordingState(true);
