@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="team8.eecscap.ku.auricle.SettingsActivity"
+    tools:context="ku.eecscap.team8.auricle.SettingsActivity"
     tools:showIn="@layout/activity_settings">
 
     <FrameLayout
