@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -41,8 +40,8 @@ public class Auricle extends Application {
         return true;
     }
 
-    protected void saveRecordingAs(String file) {
-        recorder.saveRecording("temp.pcm",file);
+    protected void saveRecordingAs(String file, int leftSeconds, int rightSeconds) {
+        recorder.saveRecording("temp.pcm", file, leftSeconds, rightSeconds);
     }
 
     protected void setRecordingState(boolean state) {

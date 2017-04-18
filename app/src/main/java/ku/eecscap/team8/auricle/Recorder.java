@@ -65,7 +65,6 @@ public class Recorder {
         this.chunkSize = sampleRate * (bitsPerSample/8) * chunkSizeInSeconds;  // Bytes per chunk, approx. 2 seconds of audio
 
         this.numChunks = (bufferSize/chunkSize); // future replacement for hardcoded value
-//        this.numChunks = 20;
     }
 
     /*
@@ -233,10 +232,13 @@ public class Recorder {
         return "AuricleRecording_" + currentDateAndTime + saveFileType;
     }
 
-    protected void saveRecording(String dataFileName, String finalFileName) {
+    protected void saveRecording(String dataFileName, String finalFileName, int leftSeconds, int rightSeconds) {
+        int startByte = sampleRate * (bitsPerSample/8) * leftSeconds;
+        int endByte = sampleRate * (bitsPerSample/8) * rightSeconds;
         switch (saveFileType) {
             case ".wav":
             default:
+                //trimFile(saveFileName, startByte, endByte);
                 String internalWavFileName = internalWAV(dataFileName);
                 getFileList(); // for debugging
                 if(internalWavFileName != "") exportLocalFileExternal(internalWavFileName, finalFileName + ".wav");

@@ -15,6 +15,7 @@
     <string name="post_record_filename">Filename</string>
     <string name="post_record_slice_clip">Slice clip</string>
     <string name="save">Save</string>
+    <string name="close">Default</string>
 
     <!-- Preferences -->
     <string name="preference_category_general">General</string>
