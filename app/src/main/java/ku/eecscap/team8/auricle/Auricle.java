@@ -28,6 +28,7 @@ public class Auricle extends Application {
     private int bitsPerSample = 16;
     private int chunkSizeInSeconds = 2;
     private int sampleRate = 44100;
+    private int compBitrate = 32000;
 
     protected boolean startRecording(){
         recorder = new Recorder(this);
@@ -62,6 +63,7 @@ public class Auricle extends Application {
                 {"dateFormat", "yyyyMMdd_HHmmss"},
                 {"sampleRate", String.valueOf(sampleRate)},
                 {"chunkSizeInSeconds", String.valueOf(chunkSizeInSeconds)},
+                {"compBitrate", String.valueOf(compBitrate)},
                 {"bitsPerSample", String.valueOf(bitsPerSample)}
         };
         return createConfigMap(recorderConfigData);
