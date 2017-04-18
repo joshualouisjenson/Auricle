@@ -5,6 +5,10 @@ import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.media.MediaMuxer;
+import android.media.MediaFormat;
+import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
 import android.media.audiofx.AcousticEchoCanceler;
 import android.media.audiofx.AutomaticGainControl;
 import android.media.audiofx.NoiseSuppressor;
@@ -21,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -241,7 +246,7 @@ public class Recorder {
             case "m4a":
                 //trimFile(dataFileName, startByte, endByte);
                 saveFileName = saveFileName + ".m4a";
-                compressFile(fileToSave,saveFileName);
+                compressFile(dataFileName,saveFileName);
                 break;
             case "wav":
             default:
