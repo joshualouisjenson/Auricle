@@ -47,6 +47,7 @@ public class Recorder {
     private int chunkSize;
     private int numChunks;
     private int sampleRate;
+    private int compBitrate;
     private int chunkSizeInSeconds;
 
     /*=============================================================================
@@ -60,6 +61,7 @@ public class Recorder {
         this.saveFileType = config.get("saveFileType");
         this.bufferSize = Integer.parseInt(config.get("bufferSize")); // in bytes
         this.sampleRate = Integer.parseInt(config.get("sampleRate"));
+        this.compBitrate = Integer.parseInt(config.get("compBitrate"));
         this.bitsPerSample = Integer.parseInt(config.get("bitsPerSample"));
         this.chunkSizeInSeconds = Integer.parseInt(config.get("chunkSizeInSeconds"));
         this.chunkSize = sampleRate * (bitsPerSample/8) * chunkSizeInSeconds;  // Bytes per chunk, approx. 2 seconds of audio
@@ -236,9 +238,14 @@ public class Recorder {
         int startByte = sampleRate * (bitsPerSample/8) * leftSeconds;
         int endByte = sampleRate * (bitsPerSample/8) * rightSeconds;
         switch (saveFileType) {
-            case ".wav":
+            case "m4a":
+                //trimFile(dataFileName, startByte, endByte);
+                saveFileName = saveFileName + ".m4a";
+                compressFile(fileToSave,saveFileName);
+                break;
+            case "wav":
             default:
-                //trimFile(saveFileName, startByte, endByte);
+                //trimFile(dataFileName, startByte, endByte);
                 String internalWavFileName = internalWAV(dataFileName);
                 getFileList(); // for debugging
                 if(internalWavFileName != "") exportLocalFileExternal(internalWavFileName, finalFileName + ".wav");
@@ -392,6 +399,133 @@ public class Recorder {
         }
     }
 
+    //Compression
+    private void compressFile(String rawFileName, String compFileName){
+        //String nameLog = "log.txt";
+        //Init constants
+        String mimeType = "audio/mp4a-latm";
+        int codecTimeout = 5000;
+        int bufferSize = 2*sampleRate;
+        try {
+            //Log file setup for testing
+            //File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"Auricle/log.txt");
+            //FileOutputStream log = new FileOutputStream(externalFile);
+            //log.write(("start\n").getBytes());
+
+            //File Setup
+            File auricleDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"Auricle/");
+            auricleDirectory.mkdir();
+            FileInputStream fis = app.openFileInput(rawFileName);
+            compFileName = "Auricle/" + compFileName;
+            File compFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),compFileName);
+            if(compFile.exists())compFile.delete();
+
+            //Media Stuff setup
+            MediaMuxer mux = new MediaMuxer(compFile.getAbsolutePath(), MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+            MediaFormat outputFormat = MediaFormat.createAudioFormat(mimeType, sampleRate, 1);
+            outputFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
+            outputFormat.setInteger(MediaFormat.KEY_BIT_RATE, compBitrate);
+            MediaCodec codec = MediaCodec.createEncoderByType(mimeType);
+            codec.configure(outputFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            codec.start();
+
+            ByteBuffer[] inBuffers = codec.getInputBuffers();//Yes, its deprecated, but it works.
+            ByteBuffer[] outBuffers = codec.getOutputBuffers();
+
+            MediaCodec.BufferInfo outBufferInfo = new MediaCodec.BufferInfo();
+
+            byte[] tempBuffer = new byte[bufferSize];
+            int totalBytesRead = 0;
+            double presTime = 0;//time stamp in microseconds
+            boolean done = false;
+            int trackIndex = 0;
+
+            //log.write(("before Loop\n").getBytes());
+
+
+            do{
+                //log.write(("start Loop " + "\n").getBytes());
+
+                //Put audio into input buffers
+                int inBufferIndex = 0;
+                while( (inBufferIndex != -1) && (!done) ){
+                    inBufferIndex = codec.dequeueInputBuffer(codecTimeout);
+                    if(inBufferIndex >= 0){
+                        //Set up in buffer to recieve data
+                        ByteBuffer tempByteBuffer = inBuffers[inBufferIndex];
+                        tempByteBuffer.clear();
+
+                        //read data to temp buffer
+                        int currentBytesRead = fis.read(tempBuffer,0,tempByteBuffer.limit());
+                        if(currentBytesRead == -1){
+                            //End of File
+                            //log.write(("EOF\n").getBytes());
+                            done = true;
+                            codec.queueInputBuffer(inBufferIndex,0,0,(long) presTime,MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                        } else {
+                            //log.write(("not EOF\n").getBytes());
+                            totalBytesRead += currentBytesRead;
+                            tempByteBuffer.put(tempBuffer,0,currentBytesRead);
+                            codec.queueInputBuffer(inBufferIndex,0,currentBytesRead,(long) presTime,0);
+                            presTime = 1000000l * (totalBytesRead/2)/sampleRate;//Get new time stamp in us
+                        }
+                    }
+                }
+
+                //Take audio from output buffers
+                //log.write(("begin Out: ").getBytes());
+                int outBufferIndex = 0;
+                while(outBufferIndex != MediaCodec.INFO_TRY_AGAIN_LATER ){
+                    //log.write(("in out loop: ").getBytes());
+                    //while the call doesnt time out
+                    outBufferIndex = codec.dequeueOutputBuffer(outBufferInfo,codecTimeout);
+                    //String t = "obi =" + Integer.toString(outBufferIndex) + ": ";
+                    //log.write((t).getBytes());
+
+                    if(outBufferIndex >= 0){
+                        //log.write(("buf index >= 0\n").getBytes());
+                        ByteBuffer encodedData = outBuffers[outBufferIndex];
+                        encodedData.position(outBufferInfo.offset);
+                        encodedData.limit(outBufferInfo.offset + outBufferInfo.size);
+
+                        if((outBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0 && outBufferInfo.size != 0){
+                            //Outbuffer contains config info and not media, dont add to media
+                            //log.write(("no data\n").getBytes());
+                            codec.releaseOutputBuffer(outBufferIndex,false);
+                        } else {
+                            //log.write(("data a: ").getBytes());
+
+                            mux.writeSampleData(trackIndex,outBuffers[outBufferIndex],outBufferInfo);
+                            //log.write(("data b: ").getBytes());
+                            codec.releaseOutputBuffer(outBufferIndex,false);
+                            //log.write(("data c\n").getBytes());
+                        }
+                    } else if (outBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                        //outputFormat = codec.getOutputFormat();
+                        mux.addTrack(codec.getOutputFormat());
+                        mux.start();
+                        //log.write(("format change?\n").getBytes());
+                    }
+                }
+            }while((outBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) == 0);
+
+            //log.write(("done\n").getBytes());
+            fis.close();
+            mux.stop();
+            mux.release();
+
+        } catch(Exception e){
+            try {
+                //Way to write errors to log file
+                File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Auricle/loge.txt");
+                FileOutputStream log = new FileOutputStream(externalFile);
+                String message = "Error while exporting file: " + e.getMessage();
+                log.write((message).getBytes());
+            }catch (Exception e1){
+
+            }
+        }
+    }
 
     private static byte[] intToByteArray(int i)
     {
