@@ -1,6 +1,8 @@
 package ku.eecscap.team8.auricle;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -31,6 +33,7 @@ public class AboutActivity extends AppCompatActivity {
             }
         });
 
+        // Get app version
         Element versionEl = new Element();
         String versionName = "";
         try {
@@ -41,11 +44,17 @@ public class AboutActivity extends AppCompatActivity {
         }
         versionEl.setTitle("Version " + versionName);
 
+        // Configure credit elements
         Element creditEl1 = new Element();
         creditEl1.setTitle("MaterialRangeBar");
+        Intent credit1Intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.mrbUri)));
+        creditEl1.setIntent(credit1Intent);
         Element creditEl2 = new Element();
         creditEl2.setTitle("Android About Page");
+        Intent credit2Intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.aapUri)));
+        creditEl2.setIntent(credit2Intent);
 
+        // Create about page
         View aboutPage = new AboutPage(this)
                 .isRTL(false)
                 .setImage(R.mipmap.ic_launcher)

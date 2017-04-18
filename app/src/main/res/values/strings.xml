@@ -25,4 +25,8 @@
     <string name="preference_data_audio_format_title">Audio format</string>
     <string name="preference_data_audio_format_dialog">Select a format</string>
     <string name="preference_data_voice_text">Voice to text</string>
+
+    <!-- Other -->
+    <string name="mrbUri">https://github.com/oli107/material-range-bar</string>
+    <string name="aapUri">https://github.com/medyo/android-about-page</string>
 </resources>
