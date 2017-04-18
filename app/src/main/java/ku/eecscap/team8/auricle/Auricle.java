@@ -45,6 +45,10 @@ public class Auricle extends Application {
         recorder.saveRecording("temp.pcm", file, leftSeconds, rightSeconds);
     }
 
+    public int getFileLengthInSeconds() {
+        return recorder.getFileLengthInSeconds();
+    }
+
     protected void setRecordingState(boolean state) {
         isRecording = state;
     }

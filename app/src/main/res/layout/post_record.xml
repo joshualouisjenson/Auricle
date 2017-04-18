@@ -25,9 +25,6 @@
         android:layout_height="72dp"
         android:layout_marginLeft="@dimen/dialog_item_margin"
         android:layout_marginRight="@dimen/dialog_item_margin"
-        custom:tickStart="0"
-        custom:tickInterval="1"
-        custom:tickEnd="10"
         custom:pinRadius="16dp"
         custom:selectorSize="7dp"/>
 

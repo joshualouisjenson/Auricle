@@ -547,5 +547,10 @@ public class Recorder {
     {
         return new byte[]{(byte)(data & 0xff),(byte)((data >>> 8) & 0xff)};
     }
+
+    public int getFileLengthInSeconds() {
+        long byteLength = new File(app.getFilesDir().getAbsolutePath()+"/temp.pcm").length();
+        return (int) (byteLength / 88200);
+    }
 }
 

@@ -21,11 +21,10 @@ import com.appyvet.rangebar.RangeBar;
 
 public class PostRecord {
 
-    Auricle mApp;
+    private Auricle mApp;
     private Activity mContext;
     private Utilities utilities;
-
-    int leftSeconds = 0, rightSeconds = 0;
+    private int leftSeconds = 0, rightSeconds = 0;
 
     public PostRecord(Auricle app, Activity context) {
         mApp = app;
@@ -41,7 +40,7 @@ public class PostRecord {
         // Configure filename edit to enable Save button when valid
         final EditText clipFilename = (EditText) dialogView.findViewById(R.id.post_record_filename);
 
-        // Configure seek bar
+        // Configure range bar formatter and change listener
         final RangeBar rangeBar = (RangeBar) dialogView.findViewById(R.id.post_record_rangebar);
         rangeBar.setFormatter(new IRangeBarFormatter() {
             @Override
@@ -62,6 +61,7 @@ public class PostRecord {
         // Disable orientation changes to prevent parent activity reinitialization
         mContext.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        // Build and show dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext)
                 .setTitle(R.string.post_record_dialog_title)
                 .setView(dialogView)
@@ -96,6 +96,11 @@ public class PostRecord {
         final AlertDialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
+
+        // Set range bar tick settings
+        rangeBar.setTickStart(0);
+        rangeBar.setTickInterval(1);
+        rangeBar.setTickEnd(mApp.getFileLengthInSeconds());
 
         // Disable Save button initially; allow valid filename to enable it
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
