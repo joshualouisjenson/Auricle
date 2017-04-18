@@ -25,7 +25,7 @@
         <item>.m4a</item>
     </string-array>
     <string-array name="preference_data_audio_format_values">
-        <item>wav</item>
-        <item>m4a</item>
+        <item>.wav</item>
+        <item>.m4a</item>
     </string-array>
 </resources>

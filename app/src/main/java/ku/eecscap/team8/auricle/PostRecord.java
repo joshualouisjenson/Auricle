@@ -59,7 +59,7 @@ public class PostRecord {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // Save the clip with the entered filename
 //                        EditText clipFilename = (EditText) dialogView.findViewById(R.id.post_record_filename);
-                        String filename = clipFilename.getText().toString() + ".wav";
+                        String filename = clipFilename.getText().toString();
                         mApp.saveRecordingAs(filename);
 
                         // Close dialog

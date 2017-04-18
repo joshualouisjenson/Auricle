@@ -6,11 +6,16 @@ package ku.eecscap.team8.auricle;
  */
 
 import android.app.Application;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
+import java.io.File;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +41,7 @@ public class Auricle extends Application {
         return true;
     }
 
-    public void saveRecordingAs(String file) {
+    protected void saveRecordingAs(String file) {
         recorder.saveRecording("temp.pcm",file);
     }
 
@@ -48,13 +53,12 @@ public class Auricle extends Application {
         return isRecording;
     }
 
-    public Map<String,String> getRecorderConfig() {
+    protected Map<String,String> getRecorderConfig() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         String[][] recorderConfigData = new String[][]{
                 //{"useVoiceToText", prefs.getString("voice_text", "false")},
-                {"saveFileName", prefs.getString("save_location", "AuricleRecording_")},
-                {"saveFileType", prefs.getString("audio_format", "m4a")},
+                {"saveFileType", prefs.getString("audio_format", ".m4a")},
                 {"bufferSize", String.valueOf(sampleRate*numChannels*(bitsPerSample/8) * 60*Integer.parseInt(prefs.getString("buffer_length", "30")))},
                 {"dateFormat", "yyyyMMdd_HHmmss"},
                 {"sampleRate", String.valueOf(sampleRate)},
@@ -70,5 +74,17 @@ public class Auricle extends Application {
             config.put(option[0], option[1]);
         }
         return config;
+    }
+
+    protected void sendEmailWithFileAttachment(File file, String filename) {
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        emailIntent.setType("vnd.android.cursor.dir/email"); // May need to change type to "vnd.android.cursor.dir/email" , not sure
+        // emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {"jon@example.com"}); // if we want to configure default recipient(s)
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, filename);
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "Audio file attached.");
+        emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+        emailIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(emailIntent);
+       // startActivity(Intent.createChooser(emailIntent , "Send email..."));
     }
 }
