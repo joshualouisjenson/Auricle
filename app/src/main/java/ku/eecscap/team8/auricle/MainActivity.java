@@ -14,6 +14,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.support.v4.app.ActivityCompat;
+import android.Manifest;
+
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,7 +32,9 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         app = (Auricle) this.getApplication();
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 101);
     }
+
 
     public void toggleRecording(View view) {
         int newImage;
