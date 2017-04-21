@@ -13,14 +13,20 @@
     <!-- Dialogs -->
     <string name="post_record_dialog_title">Save clip</string>
     <string name="post_record_filename">Filename</string>
+    <string name="post_record_slice_clip">Slice clip</string>
     <string name="save">Save</string>
+    <string name="close">Default</string>
 
     <!-- Preferences -->
     <string name="preference_category_general">General</string>
     <string name="preference_category_data">Data</string>
-    <string name="preference_data_buffer_length">Buffer length</string>
+    <string name="preference_data_buffer_length_title">Buffer length</string>
     <string name="preference_data_buffer_length_dialog">Select a length</string>
-    <string name="preference_data_audio_format">Audio format</string>
+    <string name="preference_data_audio_format_title">Audio format</string>
     <string name="preference_data_audio_format_dialog">Select a format</string>
     <string name="preference_data_voice_text">Voice to text</string>
+
+    <!-- Other -->
+    <string name="mrbUri">https://github.com/oli107/material-range-bar</string>
+    <string name="aapUri">https://github.com/medyo/android-about-page</string>
 </resources>

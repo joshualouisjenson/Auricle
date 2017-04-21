@@ -1,8 +1,8 @@
 package ku.eecscap.team8.auricle;
 
 /**
- * Created by Austin Kurtti
- * Modified by Austin Kurtti on 4/3/2017.
+ * Created by Austin Kurtti on 11/16/2016
+ * Modified by Austin Kurtti on 4/3/2017
  */
 
 import android.content.Intent;
@@ -79,6 +79,11 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             Intent settingsIntent = new Intent(this, SettingsActivity.class);
             startActivity(settingsIntent);
+            return true;
+        }
+        else if(id == R.id.action_about) {
+            Intent aboutIntent = new Intent(this, AboutActivity.class);
+            startActivity(aboutIntent);
             return true;
         }
 

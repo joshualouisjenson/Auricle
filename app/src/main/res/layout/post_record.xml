@@ -5,11 +5,27 @@
     android:layout_height="wrap_content">
 
     <EditText
-        android:id="@+id/post_record_clip_filename"
+        android:id="@+id/post_record_filename"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginLeft="@dimen/dialog_item_margin"
+        android:layout_marginRight="@dimen/dialog_item_margin"
         android:hint="@string/post_record_filename"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:text="@string/post_record_slice_clip"/>
+    <com.appyvet.rangebar.RangeBar
+        xmlns:custom="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/post_record_rangebar"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginLeft="@dimen/dialog_item_margin"
+        android:layout_marginRight="@dimen/dialog_item_margin"
+        custom:pinRadius="16dp"
+        custom:selectorSize="7dp"/>
 
 </LinearLayout>
