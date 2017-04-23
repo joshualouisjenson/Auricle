@@ -83,7 +83,7 @@ public class PostRecord {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // Save the clip with a default filename
-                        String filename = utilities.getTimestampFilename();
+                        String filename = "AuricleRecording-" + utilities.getTimestampFilename();
                         mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
 
                         // Close dialog
