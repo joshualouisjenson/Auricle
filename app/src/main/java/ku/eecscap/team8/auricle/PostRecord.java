@@ -16,7 +16,7 @@ import com.appyvet.rangebar.RangeBar;
 
 /**
  * Created by Austin Kurtti on 4/3/2017.
- * Last Edited by Joshua Jenson on 4/17/2017
+ * Last Edited by Jake Kennedy on 4/23/2017
  */
 
 public class PostRecord {
@@ -69,7 +69,7 @@ public class PostRecord {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // Save the clip with the entered filename
-                        String filename = clipFilename.getText().toString() + ".wav";
+                        String filename = clipFilename.getText().toString();
                         mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
 
                         // Close dialog
@@ -83,7 +83,7 @@ public class PostRecord {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // Save the clip with a default filename
-                        String filename = utilities.getTimestampFilename() + ".wav";
+                        String filename = utilities.getTimestampFilename();
                         mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
 
                         // Close dialog
