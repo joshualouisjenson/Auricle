@@ -32,7 +32,7 @@ import java.util.Map;
 
 /**
  * Created by Joshua Jenson on 11/10/2016.
- * Last Edited by Joshua Jenson on 4/11/2017
+ * Last Edited by Jake Kennedy on 4/23/2017
  */
 
 public class Recorder {
@@ -243,12 +243,11 @@ public class Recorder {
         int startByte = sampleRate * (bitsPerSample/8) * leftSeconds;
         int endByte = sampleRate * (bitsPerSample/8) * rightSeconds;
         switch (saveFileType) {
-            case "m4a":
+            case ".m4a":
                 //trimFile(dataFileName, startByte, endByte);
-                saveFileName = saveFileName + ".m4a";
-                compressFile(dataFileName,saveFileName);
+                compressFile(dataFileName,finalFileName + ".m4a");
                 break;
-            case "wav":
+            case ".wav":
             default:
                 //trimFile(dataFileName, startByte, endByte);
                 String internalWavFileName = internalWAV(dataFileName);
