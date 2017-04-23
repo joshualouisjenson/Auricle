@@ -5,6 +5,7 @@ import java.util.Calendar;
 
 /**
  * Created by Austin Kurtti on 4/17/2017.
+ * Last Edited by Jake Kennedy on 4/23/2017
  */
 
 public class Utilities {
@@ -19,6 +20,6 @@ public class Utilities {
     }
 
     public String getTimestampFilename() {
-        return new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss").format(Calendar.getInstance().getTime());
+        return new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(Calendar.getInstance().getTime());
     }
 }
