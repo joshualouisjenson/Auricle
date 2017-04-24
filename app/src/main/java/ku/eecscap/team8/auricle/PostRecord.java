@@ -100,7 +100,7 @@ public class PostRecord {
         // Set range bar tick settings
         rangeBar.setTickStart(0);
         rangeBar.setTickInterval(1);
-        rangeBar.setTickEnd(mApp.getFileLengthInSeconds());
+        rangeBar.setTickEnd(mApp.mergeBufAs());
 
         // Disable Save button initially; allow valid filename to enable it
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
