@@ -54,6 +54,8 @@ public class Recorder {
     private int sampleRate;
     private int compBitrate;
     private int chunkSizeInSeconds;
+    private int BufEnd;
+    private boolean BufLooped;
 
     /*=============================================================================
     =================================== Methods ===================================
@@ -127,6 +129,8 @@ public class Recorder {
                 fileOut.close();
                 if( !app.getRecordingState() ){
                     done = true;//Stopped Recording
+                    BufLooped = looped;
+                    BufEnd = i;
                 }else if(i==numChunks){
                     // Still Recording and buffer is full, set i = 0 so next file is temp1.pcm
                     i=0;
@@ -134,7 +138,7 @@ public class Recorder {
                 }
             }
             
-            mergeBuf(looped,i);
+            //mergeBuf(looped,i);
 
             //Temporary test case for file, ignore
             //int start = 88200*5;
@@ -156,9 +160,11 @@ public class Recorder {
         }
     }
 
-    private void mergeBuf(boolean looped, int end){
+    protected int mergeBuf(boolean looped, int end){
         int byteBufferSize = 128;
 
+        looped = BufLooped;
+        end = BufEnd;
         //Now loop over every one
         try {
             //Open the local file stream
@@ -200,6 +206,8 @@ public class Recorder {
         } catch(Exception e){
             String message = "Error while exporting file: " + e.getMessage();
         }
+        int dataLength = (int) new File(app.getFilesDir().getAbsolutePath()+"/temp.pcm").length();
+        return dataLength/(sampleRate*bitsPerSample/8);
     }
 
     //Temporary, not final yet
@@ -211,7 +219,7 @@ public class Recorder {
 
         try {
             FileInputStream localFileStream = app.openFileInput(fileName);
-            FileOutputStream os = app.openFileOutput(trimmedFileName, Context.MODE_PRIVATE);
+            BufferedOutputStream os = new BufferedOutputStream(app.openFileOutput(trimmedFileName, Context.MODE_PRIVATE));
             int written = 0;
             //First read and do nothing with first startByte bytes
             while (written < startByte) {
@@ -242,17 +250,25 @@ public class Recorder {
     protected void saveRecording(String dataFileName, String finalFileName, int leftSeconds, int rightSeconds) {
         int startByte = sampleRate * (bitsPerSample/8) * leftSeconds;
         int endByte = sampleRate * (bitsPerSample/8) * rightSeconds;
+        String internalWavFileName = "";
         switch (saveFileType) {
             case ".m4a":
-                //trimFile(dataFileName, startByte, endByte);
+                dataFileName = trimFile(dataFileName, startByte, endByte);
                 compressFile(dataFileName,finalFileName + ".m4a");
                 break;
             case ".wav":
-            default:
-                //trimFile(dataFileName, startByte, endByte);
-                String internalWavFileName = internalWAV(dataFileName);
+                dataFileName = trimFile(dataFileName, startByte, endByte);
+                internalWavFileName = internalWAV(dataFileName);
                 getFileList(); // for debugging
                 if(internalWavFileName != "") exportLocalFileExternal(internalWavFileName, finalFileName + ".wav");
+                break;
+            default:
+                //No Trimming, and does both wav and m4a file saving to acknowledge it is neither
+                //trimFile(dataFileName, startByte, endByte);
+                internalWavFileName = internalWAV(dataFileName);
+                getFileList(); // for debugging
+                if(internalWavFileName != "") exportLocalFileExternal(internalWavFileName, finalFileName + ".wav");
+                compressFile(dataFileName,finalFileName + ".m4a");
                 break;
         }
     }
