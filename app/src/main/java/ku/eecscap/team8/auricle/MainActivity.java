@@ -2,13 +2,15 @@ package ku.eecscap.team8.auricle;
 
 /**
  * Created by Austin Kurtti on 11/16/2016
- * Modified by Austin Kurtti on 4/3/2017
+ * Last Edited by Austin Kurtti on 4/23/2017
  */
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -18,6 +20,7 @@ import android.view.View;
 public class MainActivity extends AppCompatActivity {
 
     Auricle app;
+    Fragment listingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +31,11 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         app = (Auricle) this.getApplication();
+
+        listingFragment = new ListingFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.content_main_frame, listingFragment);
+        transaction.commit();
     }
 
     public void toggleRecording(View view) {
@@ -54,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Show post record dialog if recording was paused
             if(paused) {
-                PostRecord postRecordDialog = new PostRecord(app, this);
+                PostRecord postRecordDialog = new PostRecord(app, this, listingFragment);
                 postRecordDialog.show();
             }
         }

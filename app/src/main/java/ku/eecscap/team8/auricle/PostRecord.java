@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -16,20 +17,24 @@ import com.appyvet.rangebar.RangeBar;
 
 /**
  * Created by Austin Kurtti on 4/3/2017.
- * Last Edited by Jake Kennedy on 4/23/2017
+ * Last Edited by Austin Kurtti on 4/23/2017
  */
 
 public class PostRecord {
 
     private Auricle mApp;
     private Activity mContext;
+    private DBHelper dbHelper;
     private Utilities utilities;
+    private Fragment listingFragment;
     private int leftSeconds = 0, rightSeconds = 0;
 
-    public PostRecord(Auricle app, Activity context) {
+    public PostRecord(Auricle app, Activity context, Fragment fragment) {
         mApp = app;
         mContext = context;
+        dbHelper = new DBHelper(context);
         utilities = new Utilities();
+        listingFragment = fragment;
     }
 
     public void show() {
@@ -70,7 +75,11 @@ public class PostRecord {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // Save the clip with the entered filename
                         String filename = clipFilename.getText().toString();
+                        dbHelper.insertListingItem(filename);
                         mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
+
+                        // Refresh listing
+                        listingFragment.onResume();
 
                         // Close dialog
                         dialogInterface.dismiss();
@@ -84,7 +93,11 @@ public class PostRecord {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // Save the clip with a default filename
                         String filename = "AuricleRecording-" + utilities.getTimestampFilename();
+                        dbHelper.insertListingItem(filename);
                         mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
+
+                        // Refresh listing
+                        listingFragment.onResume();
 
                         // Close dialog
                         dialogInterface.dismiss();
