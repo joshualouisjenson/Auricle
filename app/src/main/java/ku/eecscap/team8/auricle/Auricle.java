@@ -2,7 +2,7 @@ package ku.eecscap.team8.auricle;
 
 /*
  * Created by Joshua Jenson on 2/2/2017.
- * Last Edited by Joshua Jenson on 4/11/2017
+ * Last Edited by Jake Kennedy on 4/23/2017
  */
 
 import android.app.Application;
@@ -43,6 +43,9 @@ public class Auricle extends Application {
 
     protected void saveRecordingAs(String file, int leftSeconds, int rightSeconds) {
         recorder.saveRecording("temp.pcm", file, leftSeconds, rightSeconds);
+    }
+    protected int mergeBufAs(){
+        return recorder.mergeBuf(true,1);
     }
 
     public int getFileLengthInSeconds() {
