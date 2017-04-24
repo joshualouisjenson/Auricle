@@ -47,6 +47,7 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHold
             }
         });
 
+        holder.title.setTag(R.integer.tag_key_listing_id, listingId);
         holder.title.setText(title);
     }
 

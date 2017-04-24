@@ -33,7 +33,7 @@ public class PostRecord {
         mApp = app;
         mContext = context;
         dbHelper = new DBHelper(context);
-        utilities = new Utilities();
+        utilities = new Utilities(context.getApplicationContext());
         listingFragment = fragment;
     }
 
