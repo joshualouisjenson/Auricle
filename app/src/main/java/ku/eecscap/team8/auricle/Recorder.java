@@ -34,7 +34,7 @@ import java.util.Map;
 
 /**
  * Created by Joshua Jenson on 11/10/2016.
- * Last Edited by Jake Kennedy on 4/23/2017
+ * Last Edited by Jake Kennedy on 4/24/2017
  */
 
 public class Recorder {
@@ -140,7 +140,7 @@ public class Recorder {
                 }
             }
             
-            //mergeBuf(looped,i);
+            mergeBuf(looped,i);
 
             //Temporary test case for file, ignore
             //int start = 88200*5;
@@ -165,8 +165,6 @@ public class Recorder {
     protected int mergeBuf(boolean looped, int end){
         int byteBufferSize = 128;
 
-        looped = BufLooped;
-        end = BufEnd;
         //Now loop over every one
         try {
             //Open the local file stream
@@ -716,8 +714,32 @@ public class Recorder {
     }
 
     public int getFileLengthInSeconds() {
-        long byteLength = new File(app.getFilesDir().getAbsolutePath()+"/temp.pcm").length();
-        return (int) (byteLength / 88200);
+        boolean looped = BufLooped;
+        int end = BufEnd;
+        int byteLength = 0;
+        try {
+            int start;
+            if(looped){
+                start = (end % numChunks) + 1;
+            }else{
+                start = 1;
+            }
+
+            boolean done = false;
+            while(!done) {
+                String name = "temp" + Integer.toString(start) + ".pcm";
+                byteLength += (int) new File(app.getFilesDir().getAbsolutePath()+"/" + name).length();
+
+                if (start != end) {
+                    start = (start % numChunks) + 1;//set start to next int in the circular buffer
+                } else {
+                    done = true;//Done finding file length
+                }
+            }
+        } catch(Exception e){
+            String message = "Error while exporting file: " + e.getMessage();
+        }
+        return (byteLength / (sampleRate*bitsPerSample/8));
     }
 }
 
