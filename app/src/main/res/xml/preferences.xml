@@ -17,10 +17,6 @@
         android:dialogTitle="@string/preference_data_audio_format_dialog"
         android:entries="@array/preference_data_audio_format_names"
         android:entryValues="@array/preference_data_audio_format_values"
-        android:defaultValue="wav"/>
-    <SwitchPreference
-        android:key="voice_text"
-        android:title="@string/preference_data_voice_text"
-        android:defaultValue="false"/>
+        android:defaultValue=".m4a"/>
 
 </PreferenceScreen>
