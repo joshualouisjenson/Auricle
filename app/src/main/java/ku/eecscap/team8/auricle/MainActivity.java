@@ -19,8 +19,12 @@ import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
-    Auricle app;
-    Fragment listingFragment;
+    static final String KEY_FAB_IMAGE = "fabImage";
+
+    private FloatingActionButton fab;
+    private Auricle app;
+    private Fragment listingFragment;
+    private int fabImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,32 +36,52 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         app = (Auricle) this.getApplication();
 
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fabImage = R.drawable.ic_record_24dp;
+
         listingFragment = new ListingFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.content_main_frame, listingFragment);
         transaction.commit();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save fab image
+        savedInstanceState.putInt(KEY_FAB_IMAGE, fabImage);
+
+        // Call superclass
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Call superclass
+        super.onRestoreInstanceState(savedInstanceState);
+
+        // Restore fab image
+        fabImage = savedInstanceState.getInt(KEY_FAB_IMAGE);
+        fab.setImageResource(fabImage);
+    }
+
     public void toggleRecording(View view) {
-        int newImage;
         String message;
         boolean successful, paused;
 
         if(((Auricle) this.getApplication()).getRecordingState()) {
-            newImage = R.drawable.ic_record_24dp;
+            fabImage = R.drawable.ic_record_24dp;
             message = getResources().getString(R.string.record_stop_message);
             successful = app.stopRecording();
             paused = true;
         }
         else {
-            newImage = R.drawable.ic_record_stop_24dp;
+            fabImage = R.drawable.ic_record_stop_24dp;
             message = getResources().getString(R.string.record_start_message);
             successful = app.startRecording();
             paused = false;
         }
         if(successful) {
-            final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-            fab.setImageResource(newImage);
+            fab.setImageResource(fabImage);
             Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
 
             // Show post record dialog if recording was paused
