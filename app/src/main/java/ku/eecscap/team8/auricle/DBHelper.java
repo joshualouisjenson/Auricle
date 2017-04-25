@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 /**
  * Created by Austin Kurtti on 4/23/2017.
+ * Last Edited by Austin Kurtti on 4/25/2017
  */
 
 public class DBHelper extends SQLiteOpenHelper {
@@ -17,6 +18,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String LISTING_TABLE_NAME = "listing";
     public static final String LISTING_COLUMN_LISTING_ID = "listing_id";
     public static final String LISTING_COLUMN_FILENAME = "filename";
+    public static final String LISTING_COLUMN_LENGTH = "length";
+    public static final String LISTING_COLUMN_DATE_CREATED = "date_created";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -24,7 +27,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + LISTING_TABLE_NAME + " (" + LISTING_COLUMN_LISTING_ID + " INTEGER PRIMARY KEY, " + LISTING_COLUMN_FILENAME + " TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + LISTING_TABLE_NAME + " (" + LISTING_COLUMN_LISTING_ID + " INTEGER PRIMARY KEY, " + LISTING_COLUMN_FILENAME + " TEXT, " +
+                LISTING_COLUMN_LENGTH + " TEXT, " + LISTING_COLUMN_DATE_CREATED + " TEXT)");
     }
 
     /**
@@ -42,17 +46,21 @@ public class DBHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    public void insertListingItem(String title) {
+    public void insertListingItem(String title, String length, String date_created) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(LISTING_COLUMN_FILENAME, title);
+        values.put(LISTING_COLUMN_LENGTH, length);
+        values.put(LISTING_COLUMN_DATE_CREATED, date_created);
         db.insert(LISTING_TABLE_NAME, null, values);
     }
 
-    public void updateListingItem(int id, String title) {
+    public void updateListingItem(int id, String title, String length, String date_created) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(LISTING_COLUMN_FILENAME, title);
+        if(title != null) { values.put(LISTING_COLUMN_FILENAME, title); }
+        if(length != null) { values.put(LISTING_COLUMN_LENGTH, length); }
+        if(date_created != null) { values.put(LISTING_COLUMN_DATE_CREATED, date_created); }
         String args[] = {Integer.toString(id)};
         db.update(LISTING_TABLE_NAME, values, LISTING_COLUMN_LISTING_ID + " = ?", args);
     }

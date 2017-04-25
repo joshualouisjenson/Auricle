@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 /**
  * Created by Austin Kurtti on 4/23/2017.
+ * Last Edited by Austin Kurtti on 4/25/2017
  */
 
 public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHolder> {
@@ -16,10 +17,12 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHold
     private ListingHelper[] mDataSet;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView title;
+        TextView tvTitle, tvLength, tvDateCreated;
         public ViewHolder(View view) {
             super(view);
-            title = (TextView) view.findViewById(R.id.listing_item_title);
+            tvTitle = (TextView) view.findViewById(R.id.listing_item_title);
+            tvLength = (TextView) view.findViewById(R.id.listing_item_length);
+            tvDateCreated = (TextView) view.findViewById(R.id.listing_item_date_created);
         }
     }
 
@@ -37,18 +40,22 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHold
     public void onBindViewHolder(ViewHolder holder, int position) {
         final int listingId = mDataSet[position].getId();
         final String title = mDataSet[position].getTitle();
+        final String length = mDataSet[position].getLength();
+        final String dateCreated = mDataSet[position].getDateCreated();
 
         // set listener for tapping on listing item
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // playback popup
+                // TODO: playback popup
                 Snackbar.make(view, "Clicked on: " + title, Snackbar.LENGTH_SHORT).show();
             }
         });
 
-        holder.title.setTag(R.integer.tag_key_listing_id, listingId);
-        holder.title.setText(title);
+        holder.tvTitle.setTag(R.integer.tag_key_listing_id, listingId);
+        holder.tvTitle.setText(title);
+        holder.tvLength.setText(length);
+        holder.tvDateCreated.setText(dateCreated);
     }
 
     @Override

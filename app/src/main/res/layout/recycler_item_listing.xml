@@ -1,23 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
     android:layout_marginBottom="1dp"
     android:padding="16dp">
 
-    <LinearLayout
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:id="@+id/listing_item_title"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
             android:maxLines="1"
-            android:ellipsize="end"
-            android:textSize="18sp"
-            android:textColor="@color/black"
-            android:id="@+id/listing_item_title"/>
-    </LinearLayout>
+            android:textSize="12sp"
+            android:textColor="@color/gray"
+            android:id="@+id/listing_item_date_created"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:maxLines="1"
+            android:textSize="12sp"
+            android:textColor="@color/gray"
+            android:id="@+id/listing_item_length"/>
+    </RelativeLayout>
 
 </LinearLayout>

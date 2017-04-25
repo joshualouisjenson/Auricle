@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 /**
  * Created by Austin Kurtti on 4/23/2017.
+ * Last Edited by Austin Kurtti on 4/25/2017
  */
 
 public class ListingFragment extends Fragment {
@@ -35,13 +36,7 @@ public class ListingFragment extends Fragment {
 
     @Override
     public void onResume() {
-        ListingHelper[] refreshedItems = buildDataSet();
-        mAdapter.clearDataSet();
-        mAdapter.fillDataSet(refreshedItems);
-        mAdapter.notifyDataSetChanged();
-
-        setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
-
+        refresh();
         super.onResume();
     }
 
@@ -96,6 +91,15 @@ public class ListingFragment extends Fragment {
         mRecyclerView.scrollToPosition(scrollPosition);
     }
 
+    public void refresh() {
+        ListingHelper[] refreshedItems = buildDataSet();
+        mAdapter.clearDataSet();
+        mAdapter.fillDataSet(refreshedItems);
+        mAdapter.notifyDataSetChanged();
+
+        setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
+    }
+
     public ListingHelper[] buildDataSet() {
         // query db for listing data
         Cursor allItems = dbHelper.getListingData();
@@ -107,6 +111,8 @@ public class ListingFragment extends Fragment {
                 dataSet[position] = new ListingHelper();
                 dataSet[position].setId(allItems.getInt(allItems.getColumnIndex(DBHelper.LISTING_COLUMN_LISTING_ID)));
                 dataSet[position].setTitle(allItems.getString(allItems.getColumnIndex(DBHelper.LISTING_COLUMN_FILENAME)));
+                dataSet[position].setLength(allItems.getString(allItems.getColumnIndex(DBHelper.LISTING_COLUMN_LENGTH)));
+                dataSet[position].setDateCreated(allItems.getString(allItems.getColumnIndex(DBHelper.LISTING_COLUMN_DATE_CREATED)));
                 allItems.moveToNext();
             }
         }

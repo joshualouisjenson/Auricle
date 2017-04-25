@@ -11,7 +11,7 @@ import java.util.Calendar;
 
 /**
  * Created by Austin Kurtti on 4/17/2017.
- * Last Edited by Jake Kennedy on 4/23/2017
+ * Last Edited by Austin Kurtti on 4/25/2017
  */
 
 public class Utilities {
@@ -34,6 +34,10 @@ public class Utilities {
 
     public String getTimestampFilename() {
         return new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(Calendar.getInstance().getTime());
+    }
+
+    public String getCurrentDate() {
+        return new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
     }
 
     public void playRecording(String path) {

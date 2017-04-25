@@ -17,7 +17,7 @@ import com.appyvet.rangebar.RangeBar;
 
 /**
  * Created by Austin Kurtti on 4/3/2017.
- * Last Edited by Austin Kurtti on 4/23/2017
+ * Last Edited by Austin Kurtti on 4/25/2017
  */
 
 public class PostRecord {
@@ -26,7 +26,7 @@ public class PostRecord {
     private Activity mContext;
     private DBHelper dbHelper;
     private Utilities utilities;
-    private Fragment listingFragment;
+    private ListingFragment listingFragment;
     private int leftSeconds = 0, rightSeconds = 0;
 
     public PostRecord(Auricle app, Activity context, Fragment fragment) {
@@ -34,7 +34,7 @@ public class PostRecord {
         mContext = context;
         dbHelper = new DBHelper(context);
         utilities = new Utilities(context.getApplicationContext());
-        listingFragment = fragment;
+        listingFragment = (ListingFragment) fragment;
     }
 
     public void show() {
@@ -73,13 +73,13 @@ public class PostRecord {
                 .setPositiveButton(R.string.save, new Dialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        // Save the clip with the entered filename
+                        // Save the clip
                         String filename = clipFilename.getText().toString();
-                        dbHelper.insertListingItem(filename);
+                        dbHelper.insertListingItem(filename, utilities.getTimeFromSeconds((rightSeconds - leftSeconds)), utilities.getCurrentDate());
                         mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
 
                         // Refresh listing
-                        listingFragment.onResume();
+                        listingFragment.refresh();
 
                         // Close dialog
                         dialogInterface.dismiss();
@@ -93,11 +93,11 @@ public class PostRecord {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // Save the clip with a default filename
                         String filename = "AuricleRecording-" + utilities.getTimestampFilename();
-                        dbHelper.insertListingItem(filename);
+                        dbHelper.insertListingItem(filename, utilities.getTimeFromSeconds((rightSeconds - leftSeconds)), utilities.getCurrentDate());
                         mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
 
                         // Refresh listing
-                        listingFragment.onResume();
+                        listingFragment.refresh();
 
                         // Close dialog
                         dialogInterface.dismiss();
