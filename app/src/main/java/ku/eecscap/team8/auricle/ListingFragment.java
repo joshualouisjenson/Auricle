@@ -110,7 +110,7 @@ public class ListingFragment extends Fragment {
                 position = allItems.getPosition();
                 dataSet[position] = new ListingHelper();
                 dataSet[position].setId(allItems.getInt(allItems.getColumnIndex(DBHelper.LISTING_COLUMN_LISTING_ID)));
-                dataSet[position].setTitle(allItems.getString(allItems.getColumnIndex(DBHelper.LISTING_COLUMN_FILENAME)));
+                dataSet[position].setFilename(allItems.getString(allItems.getColumnIndex(DBHelper.LISTING_COLUMN_FILENAME)));
                 dataSet[position].setLength(allItems.getString(allItems.getColumnIndex(DBHelper.LISTING_COLUMN_LENGTH)));
                 dataSet[position].setDateCreated(allItems.getString(allItems.getColumnIndex(DBHelper.LISTING_COLUMN_DATE_CREATED)));
                 allItems.moveToNext();

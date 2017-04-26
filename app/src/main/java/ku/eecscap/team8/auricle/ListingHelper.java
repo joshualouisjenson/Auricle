@@ -6,15 +6,15 @@ package ku.eecscap.team8.auricle;
  */
 
 public class ListingHelper {
-    private String title, length, dateCreated;
+    private String filename, length, dateCreated;
     private int id;
 
-    public String getTitle() {
-        return title;
+    public String getFilename() {
+        return filename;
     }
 
-    public void setTitle(String inTitle) {
-        title = inTitle;
+    public void setFilename(String inFilename) {
+        filename = inFilename;
     }
 
     public int getId() {

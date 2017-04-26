@@ -46,19 +46,19 @@ public class DBHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    public void insertListingItem(String title, String length, String date_created) {
+    public void insertListingItem(String filename, String length, String date_created) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(LISTING_COLUMN_FILENAME, title);
+        values.put(LISTING_COLUMN_FILENAME, filename);
         values.put(LISTING_COLUMN_LENGTH, length);
         values.put(LISTING_COLUMN_DATE_CREATED, date_created);
         db.insert(LISTING_TABLE_NAME, null, values);
     }
 
-    public void updateListingItem(int id, String title, String length, String date_created) {
+    public void updateListingItem(int id, String filename, String length, String date_created) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        if(title != null) { values.put(LISTING_COLUMN_FILENAME, title); }
+        if(filename != null) { values.put(LISTING_COLUMN_FILENAME, filename); }
         if(length != null) { values.put(LISTING_COLUMN_LENGTH, length); }
         if(date_created != null) { values.put(LISTING_COLUMN_DATE_CREATED, date_created); }
         String args[] = {Integer.toString(id)};
