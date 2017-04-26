@@ -2,22 +2,33 @@ package ku.eecscap.team8.auricle;
 
 /*
  * Created by Joshua Jenson on 2/2/2017.
+ * Last Edited by Jake Kennedy on 4/24/2017
  */
 
 import android.app.Application;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.preference.PreferenceManager;
 
+import java.io.File;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 public class Auricle extends Application {
 
     private Recorder recorder;
     private boolean isRecording = false;
-    private String recorderSaveFileFormat = ".wav";
-    private String recorderSaveFileName = "AuricleRecording_";
-    private String recorderBufferSizeInMB = "1";
+    private int numChannels = 1;
+    private int bitsPerSample = 16;
+    private int chunkSizeInSeconds = 2;
+    private int sampleRate = 44100;
+    private int compBitrate = 32000;
 
     protected boolean startRecording(){
         recorder = new Recorder(this);
@@ -30,6 +41,14 @@ public class Auricle extends Application {
         return true;
     }
 
+    protected void saveRecordingAs(String file, int leftSeconds, int rightSeconds) {
+        recorder.saveRecording("temp.pcm", file, leftSeconds, rightSeconds);
+    }
+
+    public int getFileLengthInSeconds() {
+        return recorder.getFileLengthInSeconds();
+    }
+
     protected void setRecordingState(boolean state) {
         isRecording = state;
     }
@@ -38,13 +57,21 @@ public class Auricle extends Application {
         return isRecording;
     }
 
-    public Map<String,String> getRecorderConfig() {
+    protected Map<String,String> getRecorderConfig() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         String[][] recorderConfigData = new String[][]{
-                {"saveFileName", recorderSaveFileName},
-                {"saveFileType", recorderSaveFileFormat},
-                {"bufferSizeInMB", recorderBufferSizeInMB},
+                //{"useVoiceToText", prefs.getString("voice_text", "false")},
+                {"saveFileType", prefs.getString("audio_format", ".m4a")},
+                {"bufferSize", String.valueOf(sampleRate*numChannels*(bitsPerSample/8) * 60*Integer.parseInt(prefs.getString("buffer_length", "30")))},
                 {"dateFormat", "yyyyMMdd_HHmmss"},
-                {"bytesPerFrame", "2"} // 2 bytes in 16bit format}
+                {"sampleRate", String.valueOf(sampleRate)},
+                {"chunkSizeInSeconds", String.valueOf(chunkSizeInSeconds)},
+                {"compBitrate", String.valueOf(compBitrate)},
+                {"bitsPerSample", String.valueOf(bitsPerSample)},
+                {"useAEC", String.valueOf(prefs.getBoolean("use_aec", true))},
+                {"useNS", String.valueOf(prefs.getBoolean("use_ns", true))},
+                {"useAGC", String.valueOf(prefs.getBoolean("use_agc", true))}
         };
         return createConfigMap(recorderConfigData);
     }
@@ -55,5 +82,17 @@ public class Auricle extends Application {
             config.put(option[0], option[1]);
         }
         return config;
+    }
+
+    protected void sendEmailWithFileAttachment(File file, String filename) {
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        emailIntent.setType("vnd.android.cursor.dir/email"); // May need to change type to "vnd.android.cursor.dir/email" , not sure
+        // emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {"jon@example.com"}); // if we want to configure default recipient(s)
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, filename);
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "Audio file attached.");
+        emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+        emailIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(emailIntent);
+       // startActivity(Intent.createChooser(emailIntent , "Send email..."));
     }
 }

@@ -1,14 +1,16 @@
 package ku.eecscap.team8.auricle;
 
 /**
- * Created by Austin Kurtti
- * Modified by Joshua Jenson on 2/2/2017.
+ * Created by Austin Kurtti on 11/16/2016
+ * Last Edited by Austin Kurtti on 4/23/2017
  */
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -16,6 +18,13 @@ import android.view.MenuItem;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
+
+    static final String KEY_FAB_IMAGE = "fabImage";
+
+    private FloatingActionButton fab;
+    private Auricle app;
+    private Fragment listingFragment;
+    private int fabImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,27 +34,61 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        app = (Auricle) this.getApplication();
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fabImage = R.drawable.ic_record_24dp;
+
+        listingFragment = new ListingFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.content_main_frame, listingFragment);
+        transaction.commit();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save fab image
+        savedInstanceState.putInt(KEY_FAB_IMAGE, fabImage);
+
+        // Call superclass
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Call superclass
+        super.onRestoreInstanceState(savedInstanceState);
+
+        // Restore fab image
+        fabImage = savedInstanceState.getInt(KEY_FAB_IMAGE);
+        fab.setImageResource(fabImage);
     }
 
     public void toggleRecording(View view) {
-        int newImage;
         String message;
-        boolean successful;
+        boolean successful, paused;
 
         if(((Auricle) this.getApplication()).getRecordingState()) {
-            newImage = R.drawable.ic_record_24dp;
+            fabImage = R.drawable.ic_record_24dp;
             message = getResources().getString(R.string.record_stop_message);
-            successful = ((Auricle) this.getApplication()).stopRecording();
+            successful = app.stopRecording();
+            paused = true;
         }
         else {
-            newImage = R.drawable.ic_record_stop_24dp;
+            fabImage = R.drawable.ic_record_stop_24dp;
             message = getResources().getString(R.string.record_start_message);
-            successful = ((Auricle) this.getApplication()).startRecording();
+            successful = app.startRecording();
+            paused = false;
         }
         if(successful) {
-            final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-            fab.setImageResource(newImage);
+            fab.setImageResource(fabImage);
             Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
+
+            // Show post record dialog if recording was paused
+            if(paused) {
+                PostRecord postRecordDialog = new PostRecord(app, this, listingFragment);
+                postRecordDialog.show();
+            }
         }
     }
 
@@ -62,6 +105,11 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             Intent settingsIntent = new Intent(this, SettingsActivity.class);
             startActivity(settingsIntent);
+            return true;
+        }
+        else if(id == R.id.action_about) {
+            Intent aboutIntent = new Intent(this, AboutActivity.class);
+            startActivity(aboutIntent);
             return true;
         }
 
