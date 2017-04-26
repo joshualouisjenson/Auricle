@@ -34,7 +34,7 @@ import java.util.Map;
 
 /**
  * Created by Joshua Jenson on 11/10/2016.
- * Last Edited by Jake Kennedy on 4/24/2017
+ * Last Edited by Jake Kennedy on 4/26/2017
  */
 
 public class Recorder {
@@ -43,8 +43,7 @@ public class Recorder {
     =============================================================================*/
     private AudioRecord recorder;
     private Thread activeThread;
-    private Thread compressionThread;
-
+    
     private Auricle app;
     private Map<String,String> config;
     private SimpleDateFormat autoDateFormat;
@@ -266,8 +265,8 @@ public class Recorder {
         String internalWavFileName = "";
         switch (saveFileType) {
             case ".m4a":
-                final String uncompFileName = mergeAndTrim(startByte, endByte, BufLooped, BufEnd);
-                final String compFileName = finalFileName + ".m4a";
+                String uncompFileName = mergeAndTrim(startByte, endByte, BufLooped, BufEnd);
+                String compFileName = finalFileName + ".m4a";
 
                 try {
                     File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Auricle/loge.txt");
@@ -275,15 +274,10 @@ public class Recorder {
                     String message = "Start: " + startByte +"\nEnd: " + endByte;
                     log.write((message).getBytes());
                 }catch(Exception e){}
+                
                 //Compression
-                compressionThread = new Thread(new Runnable() {
-                    public void run() {
-                        compressFile(uncompFileName,compFileName);
-                        exportLocalFileExternal(compFileName,compFileName);//For Testing
-                    }
-                });
-
-                compressionThread.start();
+                compressFile(uncompFileName,compFileName);
+                exportLocalFileExternal(compFileName,compFileName);//For Testing
 
                 //exportLocalFileExternal(finalFileName + ".m4a", finalFileName + ".m4a");
                 //decompressInternalFile("helloWorld.pcm",finalFileName + ".m4a");
