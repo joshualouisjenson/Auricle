@@ -56,8 +56,7 @@ public class Recorder {
     private int sampleRate;
     private int compBitrate;
     private int chunkSizeInSeconds;
-    private int BufEnd;
-    private boolean BufLooped;
+    private int fileSize;
     private boolean useAEC, useNS, useAGC;
 
     /*=============================================================================
@@ -115,6 +114,7 @@ public class Recorder {
     private void readAndWrite(){
         try {
             int byteBufferSize = 128; // in bytes
+            fileSize = 0;
 
             byte byteBuf[] = new byte[byteBufferSize];
 
@@ -135,8 +135,9 @@ public class Recorder {
                 fileOut.close();
                 if( !app.getRecordingState() ){
                     done = true;//Stopped Recording
-                    BufLooped = looped;
-                    BufEnd = i;
+                }else if(!looped && i != numChunks) {
+                    //not looped, add to fileSize
+                    fileSize += written;
                 }else if(i==numChunks){
                     // Still Recording and buffer is full, set i = 0 so next file is temp1.pcm
                     i=0;
@@ -718,32 +719,7 @@ public class Recorder {
     }
 
     public int getFileLengthInSeconds() {
-        boolean looped = BufLooped;
-        int end = BufEnd;
-        int byteLength = 0;
-        try {
-            int start;
-            if(looped){
-                start = (end % numChunks) + 1;
-            }else{
-                start = 1;
-            }
-
-            boolean done = false;
-            while(!done) {
-                String name = "temp" + Integer.toString(start) + ".pcm";
-                byteLength += (int) new File(app.getFilesDir().getAbsolutePath()+"/" + name).length();
-
-                if (start != end) {
-                    start = (start % numChunks) + 1;//set start to next int in the circular buffer
-                } else {
-                    done = true;//Done finding file length
-                }
-            }
-        } catch(Exception e){
-            String message = "Error while exporting file: " + e.getMessage();
-        }
-        return (byteLength / (sampleRate*bitsPerSample/8));
+        return (fileSize / (sampleRate*bitsPerSample/8));
     }
 }
 
