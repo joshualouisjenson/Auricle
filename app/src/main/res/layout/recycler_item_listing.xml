@@ -14,7 +14,7 @@
         android:ellipsize="end"
         android:textSize="18sp"
         android:textColor="@color/black"
-        android:id="@+id/listing_item_title"/>
+        android:id="@+id/listing_item_filename"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
