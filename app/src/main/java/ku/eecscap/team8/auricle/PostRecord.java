@@ -17,7 +17,7 @@ import com.appyvet.rangebar.RangeBar;
 
 /**
  * Created by Austin Kurtti on 4/3/2017.
- * Last Edited by Austin Kurtti on 4/26/2017
+ * Last Edited by Jake Kennedy on 4/26/2017
  */
 
 public class PostRecord {
@@ -28,6 +28,7 @@ public class PostRecord {
     private Utilities utilities;
     private ListingFragment listingFragment;
     private int leftSeconds = 0, rightSeconds = 0;
+    private int tickInt = 5;
 
     public PostRecord(Auricle app, Activity context, Fragment fragment) {
         mApp = app;
@@ -58,8 +59,8 @@ public class PostRecord {
         rangeBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onRangeChangeListener(RangeBar bar, int lpIndex, int rpIndex, String lpValue, String rpValue) {
-                leftSeconds = lpIndex;
-                rightSeconds = rpIndex;
+                leftSeconds = lpIndex*tickInt;
+                rightSeconds = rpIndex*tickInt;
             }
         });
 
@@ -98,7 +99,6 @@ public class PostRecord {
                                 utilities.getTimeFromSeconds((rightSeconds - leftSeconds)), utilities.getCurrentDate());
                         mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
 
-
                         // Refresh listing
                         listingFragment.refresh();
 
@@ -114,9 +114,24 @@ public class PostRecord {
         dialog.show();
 
         // Set range bar tick settings
+        int fileLength = mApp.getFileLengthInSeconds();
         rangeBar.setTickStart(0);
-        rangeBar.setTickInterval(1);
-        rangeBar.setTickEnd(mApp.getFileLengthInSeconds());
+        rangeBar.setTickEnd(fileLength);
+        //Compute Tick interval
+        //get chunk size = min tick interval
+        if(fileLength >= 5000){
+            //File length over 83 minutes, set tick interval to 15 sec
+            tickInt = 15;
+        }else if(fileLength >= 2500){
+            //File length over 41 minutes, set tick interval to 10 sec
+            tickInt = 10;
+        }else{
+            //Set tick interval to 5 seconds
+            tickInt = 5;
+        }
+
+        rangeBar.setTickInterval(tickInt);
+
 
         // Disable Save button initially; allow valid filename to enable it
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
@@ -139,3 +154,4 @@ public class PostRecord {
         });
     }
 }
+
