@@ -16,6 +16,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.support.v4.app.ActivityCompat;
+import android.Manifest;
+
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 101);
         AgreeTerms agreement = new AgreeTerms(this);
         agreement.show();
         super.onCreate(savedInstanceState);
@@ -35,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         app = (Auricle) this.getApplication();
-
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fabImage = R.drawable.ic_record_24dp;
 
@@ -63,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         fabImage = savedInstanceState.getInt(KEY_FAB_IMAGE);
         fab.setImageResource(fabImage);
     }
+
 
     public void toggleRecording(View view) {
         String message;
