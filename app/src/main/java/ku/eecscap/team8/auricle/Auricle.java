@@ -68,7 +68,10 @@ public class Auricle extends Application {
                 {"sampleRate", String.valueOf(sampleRate)},
                 {"chunkSizeInSeconds", String.valueOf(chunkSizeInSeconds)},
                 {"compBitrate", String.valueOf(compBitrate)},
-                {"bitsPerSample", String.valueOf(bitsPerSample)}
+                {"bitsPerSample", String.valueOf(bitsPerSample)},
+                {"useAEC", String.valueOf(prefs.getBoolean("use_aec", true))},
+                {"useNS", String.valueOf(prefs.getBoolean("use_ns", true))},
+                {"useAGC", String.valueOf(prefs.getBoolean("use_agc", true))}
         };
         return createConfigMap(recorderConfigData);
     }

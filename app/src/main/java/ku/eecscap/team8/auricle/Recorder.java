@@ -58,6 +58,7 @@ public class Recorder {
     private int chunkSizeInSeconds;
     private int BufEnd;
     private boolean BufLooped;
+    private boolean useAEC, useNS, useAGC;
 
     /*=============================================================================
     =================================== Methods ===================================
@@ -72,6 +73,9 @@ public class Recorder {
         this.sampleRate = Integer.parseInt(config.get("sampleRate"));
         this.compBitrate = Integer.parseInt(config.get("compBitrate"));
         this.bitsPerSample = Integer.parseInt(config.get("bitsPerSample"));
+        this.useAEC = Boolean.getBoolean(config.get("useAEC"));
+        this.useNS = Boolean.getBoolean(config.get("useNS"));
+        this.useAGC = Boolean.getBoolean(config.get("useAGC"));
         this.chunkSizeInSeconds = Integer.parseInt(config.get("chunkSizeInSeconds"));
         this.chunkSize = sampleRate * (bitsPerSample/8) * chunkSizeInSeconds;  // Bytes per chunk, approx. 2 seconds of audio
 
@@ -88,9 +92,9 @@ public class Recorder {
         recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, audioRecordBufferSize);
 
         if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            if(AcousticEchoCanceler.isAvailable()) AcousticEchoCanceler.create(recorder.getAudioSessionId());
-            if(NoiseSuppressor.isAvailable()) NoiseSuppressor.create(recorder.getAudioSessionId());
-            if(AutomaticGainControl.isAvailable()) AutomaticGainControl.create(recorder.getAudioSessionId());
+            if(useAEC && AcousticEchoCanceler.isAvailable()) AcousticEchoCanceler.create(recorder.getAudioSessionId());
+            if(useNS && NoiseSuppressor.isAvailable()) NoiseSuppressor.create(recorder.getAudioSessionId());
+            if(useAGC && AutomaticGainControl.isAvailable()) AutomaticGainControl.create(recorder.getAudioSessionId());
         }
 
         recorder.startRecording();
