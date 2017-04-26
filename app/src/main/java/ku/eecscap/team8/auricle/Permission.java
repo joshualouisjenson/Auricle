@@ -14,7 +14,7 @@ import android.util.Log;
 import android.support.v4.app.ActivityCompat;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-
+//ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 101);
 public class Permission extends AppCompatActivity {
 
     private static String TAG = "Auricle";
