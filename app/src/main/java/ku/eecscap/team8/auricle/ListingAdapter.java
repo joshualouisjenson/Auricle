@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 /**
  * Created by Austin Kurtti on 4/23/2017.
- * Last Edited by Austin Kurtti on 4/25/2017
+ * Last Edited by Austin Kurtti on 4/26/2017
  */
 
 public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHolder> {
@@ -40,8 +40,10 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHold
     public void onBindViewHolder(ViewHolder holder, int position) {
         final int listingId = mDataSet[position].getId();
         final String filename = mDataSet[position].getFilename();
+        final String format = mDataSet[position].getFormat();
         final String length = mDataSet[position].getLength();
         final String dateCreated = mDataSet[position].getDateCreated();
+        final String fullFile = filename + format;
 
         // set listener for tapping on listing item
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -53,7 +55,7 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHold
         });
 
         holder.tvFilename.setTag(R.integer.tag_key_listing_id, listingId);
-        holder.tvFilename.setText(filename);
+        holder.tvFilename.setText(fullFile);
         holder.tvLength.setText(length);
         holder.tvDateCreated.setText(dateCreated);
     }

@@ -17,7 +17,7 @@ import com.appyvet.rangebar.RangeBar;
 
 /**
  * Created by Austin Kurtti on 4/3/2017.
- * Last Edited by Austin Kurtti on 4/25/2017
+ * Last Edited by Austin Kurtti on 4/26/2017
  */
 
 public class PostRecord {
@@ -75,7 +75,8 @@ public class PostRecord {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // Save the clip
                         String filename = clipFilename.getText().toString();
-                        dbHelper.insertListingItem(filename, utilities.getTimeFromSeconds((rightSeconds - leftSeconds)), utilities.getCurrentDate());
+                        dbHelper.insertListingItem(filename, mApp.getAudioFormatFromPrefs(),
+                                utilities.getTimeFromSeconds((rightSeconds - leftSeconds)), utilities.getCurrentDate());
                         mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
 
                         // Refresh listing
@@ -93,8 +94,10 @@ public class PostRecord {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // Save the clip with a default filename
                         String filename = "AuricleRecording-" + utilities.getTimestampFilename();
-                        dbHelper.insertListingItem(filename, utilities.getTimeFromSeconds((rightSeconds - leftSeconds)), utilities.getCurrentDate());
+                        dbHelper.insertListingItem(filename, mApp.getAudioFormatFromPrefs(),
+                                utilities.getTimeFromSeconds((rightSeconds - leftSeconds)), utilities.getCurrentDate());
                         mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
+
 
                         // Refresh listing
                         listingFragment.refresh();

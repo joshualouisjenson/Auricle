@@ -2,7 +2,7 @@ package ku.eecscap.team8.auricle;
 
 /*
  * Created by Joshua Jenson on 2/2/2017.
- * Last Edited by Jake Kennedy on 4/24/2017
+ * Last Edited by Austin Kurtti on 4/26/2017
  */
 
 import android.app.Application;
@@ -47,6 +47,11 @@ public class Auricle extends Application {
 
     public int getFileLengthInSeconds() {
         return recorder.getFileLengthInSeconds();
+    }
+
+    public String getAudioFormatFromPrefs() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        return prefs.getString("audio_format", ".m4a");
     }
 
     protected void setRecordingState(boolean state) {

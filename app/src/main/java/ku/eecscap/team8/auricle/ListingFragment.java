@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 
 /**
  * Created by Austin Kurtti on 4/23/2017.
- * Last Edited by Austin Kurtti on 4/25/2017
+ * Last Edited by Austin Kurtti on 4/26/2017
  */
 
 public class ListingFragment extends Fragment {
@@ -111,6 +111,7 @@ public class ListingFragment extends Fragment {
                 dataSet[position] = new ListingHelper();
                 dataSet[position].setId(allItems.getInt(allItems.getColumnIndex(DBHelper.LISTING_COLUMN_LISTING_ID)));
                 dataSet[position].setFilename(allItems.getString(allItems.getColumnIndex(DBHelper.LISTING_COLUMN_FILENAME)));
+                dataSet[position].setFormat(allItems.getString(allItems.getColumnIndex(DBHelper.LISTING_COLUMN_FORMAT)));
                 dataSet[position].setLength(allItems.getString(allItems.getColumnIndex(DBHelper.LISTING_COLUMN_LENGTH)));
                 dataSet[position].setDateCreated(allItems.getString(allItems.getColumnIndex(DBHelper.LISTING_COLUMN_DATE_CREATED)));
                 allItems.moveToNext();

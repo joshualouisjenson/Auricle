@@ -2,12 +2,20 @@ package ku.eecscap.team8.auricle;
 
 /**
  * Created by Austin Kurtti on 4/23/2017.
- * Last Edited by Austin Kurtti on 4/25/2017
+ * Last Edited by Austin Kurtti on 4/26/2017
  */
 
 public class ListingHelper {
-    private String filename, length, dateCreated;
     private int id;
+    private String filename, format, length, dateCreated;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int inId) {
+        id = inId;
+    }
 
     public String getFilename() {
         return filename;
@@ -17,12 +25,12 @@ public class ListingHelper {
         filename = inFilename;
     }
 
-    public int getId() {
-        return id;
+    public String getFormat() {
+        return format;
     }
 
-    public void setId(int inId) {
-        id = inId;
+    public void setFormat(String inFormat) {
+        format = inFormat;
     }
 
     public String getLength() {

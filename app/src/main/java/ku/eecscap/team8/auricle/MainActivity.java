@@ -2,7 +2,7 @@ package ku.eecscap.team8.auricle;
 
 /**
  * Created by Austin Kurtti on 11/16/2016
- * Last Edited by Austin Kurtti on 4/23/2017
+ * Last Edited by Austin Kurtti on 4/26/2017
  */
 
 import android.content.Intent;
@@ -19,7 +19,7 @@ import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
-    static final String KEY_FAB_IMAGE = "fabImage";
+    private static final String KEY_FAB_IMAGE = "fabImage";
 
     private FloatingActionButton fab;
     private Auricle app;
