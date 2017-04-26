@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -16,20 +17,24 @@ import com.appyvet.rangebar.RangeBar;
 
 /**
  * Created by Austin Kurtti on 4/3/2017.
- * Last Edited by Joshua Jenson on 4/17/2017
+ * Last Edited by Austin Kurtti on 4/25/2017
  */
 
 public class PostRecord {
 
     private Auricle mApp;
     private Activity mContext;
+    private DBHelper dbHelper;
     private Utilities utilities;
+    private ListingFragment listingFragment;
     private int leftSeconds = 0, rightSeconds = 0;
 
-    public PostRecord(Auricle app, Activity context) {
+    public PostRecord(Auricle app, Activity context, Fragment fragment) {
         mApp = app;
         mContext = context;
-        utilities = new Utilities();
+        dbHelper = new DBHelper(context);
+        utilities = new Utilities(context.getApplicationContext());
+        listingFragment = (ListingFragment) fragment;
     }
 
     public void show() {
@@ -68,9 +73,13 @@ public class PostRecord {
                 .setPositiveButton(R.string.save, new Dialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        // Save the clip with the entered filename
-                        String filename = clipFilename.getText().toString() + ".wav";
+                        // Save the clip
+                        String filename = clipFilename.getText().toString();
+                        dbHelper.insertListingItem(filename, utilities.getTimeFromSeconds((rightSeconds - leftSeconds)), utilities.getCurrentDate());
                         mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
+
+                        // Refresh listing
+                        listingFragment.refresh();
 
                         // Close dialog
                         dialogInterface.dismiss();
@@ -83,8 +92,12 @@ public class PostRecord {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // Save the clip with a default filename
-                        String filename = utilities.getTimestampFilename() + ".wav";
+                        String filename = "AuricleRecording-" + utilities.getTimestampFilename();
+                        dbHelper.insertListingItem(filename, utilities.getTimeFromSeconds((rightSeconds - leftSeconds)), utilities.getCurrentDate());
                         mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
+
+                        // Refresh listing
+                        listingFragment.refresh();
 
                         // Close dialog
                         dialogInterface.dismiss();

@@ -12,6 +12,7 @@ import android.media.MediaCodecInfo;
 import android.media.audiofx.AcousticEchoCanceler;
 import android.media.audiofx.AutomaticGainControl;
 import android.media.audiofx.NoiseSuppressor;
+import android.media.MediaExtractor;
 import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
@@ -22,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -32,7 +34,7 @@ import java.util.Map;
 
 /**
  * Created by Joshua Jenson on 11/10/2016.
- * Last Edited by Joshua Jenson on 4/11/2017
+ * Last Edited by Jake Kennedy on 4/24/2017
  */
 
 public class Recorder {
@@ -54,6 +56,9 @@ public class Recorder {
     private int sampleRate;
     private int compBitrate;
     private int chunkSizeInSeconds;
+    private int BufEnd;
+    private boolean BufLooped;
+    private boolean useAEC, useNS, useAGC;
 
     /*=============================================================================
     =================================== Methods ===================================
@@ -68,6 +73,9 @@ public class Recorder {
         this.sampleRate = Integer.parseInt(config.get("sampleRate"));
         this.compBitrate = Integer.parseInt(config.get("compBitrate"));
         this.bitsPerSample = Integer.parseInt(config.get("bitsPerSample"));
+        this.useAEC = Boolean.getBoolean(config.get("useAEC"));
+        this.useNS = Boolean.getBoolean(config.get("useNS"));
+        this.useAGC = Boolean.getBoolean(config.get("useAGC"));
         this.chunkSizeInSeconds = Integer.parseInt(config.get("chunkSizeInSeconds"));
         this.chunkSize = sampleRate * (bitsPerSample/8) * chunkSizeInSeconds;  // Bytes per chunk, approx. 2 seconds of audio
 
@@ -84,9 +92,9 @@ public class Recorder {
         recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, audioRecordBufferSize);
 
         if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            if(AcousticEchoCanceler.isAvailable()) AcousticEchoCanceler.create(recorder.getAudioSessionId());
-            if(NoiseSuppressor.isAvailable()) NoiseSuppressor.create(recorder.getAudioSessionId());
-            if(AutomaticGainControl.isAvailable()) AutomaticGainControl.create(recorder.getAudioSessionId());
+            if(useAEC && AcousticEchoCanceler.isAvailable()) AcousticEchoCanceler.create(recorder.getAudioSessionId());
+            if(useNS && NoiseSuppressor.isAvailable()) NoiseSuppressor.create(recorder.getAudioSessionId());
+            if(useAGC && AutomaticGainControl.isAvailable()) AutomaticGainControl.create(recorder.getAudioSessionId());
         }
 
         recorder.startRecording();
@@ -127,6 +135,8 @@ public class Recorder {
                 fileOut.close();
                 if( !app.getRecordingState() ){
                     done = true;//Stopped Recording
+                    BufLooped = looped;
+                    BufEnd = i;
                 }else if(i==numChunks){
                     // Still Recording and buffer is full, set i = 0 so next file is temp1.pcm
                     i=0;
@@ -156,7 +166,7 @@ public class Recorder {
         }
     }
 
-    private void mergeBuf(boolean looped, int end){
+    protected int mergeBuf(boolean looped, int end){
         int byteBufferSize = 128;
 
         //Now loop over every one
@@ -200,6 +210,8 @@ public class Recorder {
         } catch(Exception e){
             String message = "Error while exporting file: " + e.getMessage();
         }
+        int dataLength = (int) new File(app.getFilesDir().getAbsolutePath()+"/temp.pcm").length();
+        return dataLength/(sampleRate*bitsPerSample/8);
     }
 
     //Temporary, not final yet
@@ -211,7 +223,7 @@ public class Recorder {
 
         try {
             FileInputStream localFileStream = app.openFileInput(fileName);
-            FileOutputStream os = app.openFileOutput(trimmedFileName, Context.MODE_PRIVATE);
+            BufferedOutputStream os = new BufferedOutputStream(app.openFileOutput(trimmedFileName, Context.MODE_PRIVATE));
             int written = 0;
             //First read and do nothing with first startByte bytes
             while (written < startByte) {
@@ -242,18 +254,43 @@ public class Recorder {
     protected void saveRecording(String dataFileName, String finalFileName, int leftSeconds, int rightSeconds) {
         int startByte = sampleRate * (bitsPerSample/8) * leftSeconds;
         int endByte = sampleRate * (bitsPerSample/8) * rightSeconds;
+        String internalWavFileName = "";
         switch (saveFileType) {
-            case "m4a":
-                //trimFile(dataFileName, startByte, endByte);
-                saveFileName = saveFileName + ".m4a";
-                compressFile(dataFileName,saveFileName);
+            case ".m4a":
+                dataFileName = trimFile(dataFileName, startByte, endByte);
+                try {
+                    File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Auricle/loge.txt");
+                    FileOutputStream log = new FileOutputStream(externalFile);
+                    String message = "Start: " + startByte +"\nEnd: " + endByte;
+                    log.write((message).getBytes());
+                }catch(Exception e){}
+                compressFile(dataFileName,finalFileName + ".m4a");
+                exportLocalFileExternal(finalFileName + ".m4a", finalFileName + ".m4a");
+                decompressInternalFile("helloWorld.pcm",finalFileName + ".m4a");
+                internalWavFileName = internalWAV("helloWorld.pcm");
+                if(internalWavFileName != "") exportLocalFileExternal(internalWavFileName,"helloWorld.wav");
+
+                getFileList();
                 break;
-            case "wav":
-            default:
-                //trimFile(dataFileName, startByte, endByte);
-                String internalWavFileName = internalWAV(dataFileName);
+            case ".wav":
+                dataFileName = trimFile(dataFileName, startByte, endByte);
+                try {
+                    File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Auricle/loge.txt");
+                    FileOutputStream log = new FileOutputStream(externalFile);
+                    String message = "Start: " + startByte +"\nEnd: " + endByte;
+                    log.write((message).getBytes());
+                }catch(Exception e){}
+                internalWavFileName = internalWAV(dataFileName);
                 getFileList(); // for debugging
                 if(internalWavFileName != "") exportLocalFileExternal(internalWavFileName, finalFileName + ".wav");
+                break;
+            default:
+                //No Trimming, and does both wav and m4a file saving to acknowledge it is neither
+                //trimFile(dataFileName, startByte, endByte);
+                internalWavFileName = internalWAV(dataFileName);
+                getFileList(); // for debugging
+                if(internalWavFileName != "") exportLocalFileExternal(internalWavFileName, finalFileName + ".wav");
+                compressFile(dataFileName,finalFileName + ".m4a");
                 break;
         }
     }
@@ -314,14 +351,11 @@ public class Recorder {
 
             //Delete temp files
             boolean success = true;
-            for(int i=1; i<=numChunks && success; i++) {
+            /*for(int i=1; i<=numChunks && success; i++) {
                 String tempName = "temp" + Integer.toString(i) + ".pcm";
                 success = deleteLocalFile(tempName);
-                String dir = app.getFilesDir().getAbsolutePath();
-                File f = new File(dir, tempName);
-                f.delete();
             }
-            success = deleteLocalFile("trimmed_temp.pcm");
+            success = deleteLocalFile("trimmed_temp.pcm");*/
 
             return filename;
         } catch(Exception e) {
@@ -421,9 +455,10 @@ public class Recorder {
             File auricleDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"Auricle/");
             auricleDirectory.mkdir();
             FileInputStream fis = app.openFileInput(rawFileName);
-            compFileName = "Auricle/" + compFileName;
-            File compFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),compFileName);
-            if(compFile.exists())compFile.delete();
+            //compFileName = "Auricle/" + compFileName;
+            //File compFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),compFileName);
+            //if(compFile.exists())compFile.delete();
+            File compFile = new File(app.getFilesDir().getAbsolutePath()+"/" + compFileName);
 
             //Media Stuff setup
             MediaMuxer mux = new MediaMuxer(compFile.getAbsolutePath(), MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
@@ -532,6 +567,140 @@ public class Recorder {
         }
     }
 
+    private void decompressInternalFile(String rawOutputFileName, String compInputFileName){
+        //String nameLog = "log.txt";
+        //Init constants
+        //String mimeType = "audio/mp4a-latm";
+        int codecTimeout = 5000;
+        int bufferSize = 2*sampleRate;
+        try {
+            //Log file setup for testing
+            //File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"Auricle/log.txt");
+            //FileOutputStream log = new FileOutputStream(externalFile);
+            //log.write(("start\n").getBytes());
+
+            //File Setup
+            BufferedOutputStream buffOut = new BufferedOutputStream(app.openFileOutput(rawOutputFileName,Context.MODE_PRIVATE));
+
+            /*File auricleDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"Auricle/");
+            auricleDirectory.mkdir();*/
+            FileInputStream fis = app.openFileInput(compInputFileName);
+            FileDescriptor fd = fis.getFD();
+            /*File uncompFile = new File(app.getFilesDir().getAbsolutePath() + "/" + rawFileName);
+            //compFileName = "Auricle/" + compFileName;
+            //File compFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),compFileName);
+            //if(compFile.exists())compFile.delete();
+            FileInputStream fis = app.openFileInput(compFileName);*/
+
+
+            //Media Stuff setup
+            MediaCodec codec;
+            MediaExtractor extractor = new MediaExtractor();
+            extractor.setDataSource(fd);
+            MediaFormat format = extractor.getTrackFormat(0);
+            String mime = format.getString(MediaFormat.KEY_MIME);
+
+            codec = MediaCodec.createDecoderByType(mime);
+            codec.configure(format,null,null,0);
+            codec.start();
+
+            ByteBuffer[] inBuffers = codec.getInputBuffers();//Yes, its deprecated, but it works.
+            ByteBuffer[] outBuffers = codec.getOutputBuffers();
+
+            //Needed?
+            extractor.selectTrack(0);
+
+            MediaCodec.BufferInfo outBufferInfo = new MediaCodec.BufferInfo();
+
+            boolean sawInputEos = false;
+            boolean sawOutputEos = false;
+            int inBufferIndex = 0;
+            int counter = 0;
+
+            byte[] tempBuffer = new byte[bufferSize];
+            int totalBytesRead = 0;
+            double presTime = 0;//time stamp in microseconds
+            boolean done = false;
+            int trackIndex = 0;
+
+            //log.write(("before Loop\n").getBytes());
+
+
+            while(!sawOutputEos){
+                //log.write(("start Loop " + "\n").getBytes());
+
+                //Put audio into input buffers
+                counter++;
+
+                if(!sawInputEos){
+                    inBufferIndex = codec.dequeueInputBuffer(codecTimeout);
+                    if(inBufferIndex >= 0){
+                        ByteBuffer tempByteBuffer = inBuffers[inBufferIndex];
+                        int sampleSize = extractor.readSampleData(tempByteBuffer,0);
+
+                        if(sampleSize < 0){
+                            sawInputEos = true;
+                            sampleSize = 0;
+                        }else{
+                            presTime = extractor.getSampleTime();
+                        }
+                        if(sawInputEos) {
+                            codec.queueInputBuffer(inBufferIndex, 0, sampleSize,(long) presTime, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                        }else{
+                            codec.queueInputBuffer(inBufferIndex, 0, sampleSize,(long) presTime, 0);
+                            extractor.advance();
+                        }
+
+                    }
+                }
+
+
+
+
+                //Take audio from output buffers
+                int outBufferIndex = codec.dequeueOutputBuffer(outBufferInfo,codecTimeout);
+                if(outBufferIndex >= 0){
+                    ByteBuffer rawData = outBuffers[outBufferIndex];
+                    final byte[] chunk = new byte[outBufferInfo.size];
+                    rawData.get(chunk);
+                    rawData.clear();
+
+                    if(chunk.length > 0){
+                        buffOut.write(chunk);
+                    }
+
+                    codec.releaseOutputBuffer(outBufferIndex,false);
+
+                    if((outBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0){
+                        sawOutputEos = true;
+                    }
+                } else if(outBufferIndex == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED){
+                    outBuffers = codec.getOutputBuffers();
+                } else if(outBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED){
+                    MediaFormat oFormat = codec.getOutputFormat();
+                } else {
+                    //Bad
+                }
+            }
+
+            //log.write(("done\n").getBytes());
+            buffOut.flush();
+            buffOut.close();
+            codec.stop();
+
+        } catch(Exception e){
+            try {
+                //Way to write errors to log file
+                File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Auricle/logerts.txt");
+                FileOutputStream log = new FileOutputStream(externalFile);
+                String message = "Error while exporting file: " + e.getMessage();
+                log.write((message).getBytes());
+            }catch (Exception e1){
+
+            }
+        }
+    }
+
     private static byte[] intToByteArray(int i)
     {
         byte[] b = new byte[4];
@@ -549,8 +718,32 @@ public class Recorder {
     }
 
     public int getFileLengthInSeconds() {
-        long byteLength = new File(app.getFilesDir().getAbsolutePath()+"/temp.pcm").length();
-        return (int) (byteLength / 88200);
+        boolean looped = BufLooped;
+        int end = BufEnd;
+        int byteLength = 0;
+        try {
+            int start;
+            if(looped){
+                start = (end % numChunks) + 1;
+            }else{
+                start = 1;
+            }
+
+            boolean done = false;
+            while(!done) {
+                String name = "temp" + Integer.toString(start) + ".pcm";
+                byteLength += (int) new File(app.getFilesDir().getAbsolutePath()+"/" + name).length();
+
+                if (start != end) {
+                    start = (start % numChunks) + 1;//set start to next int in the circular buffer
+                } else {
+                    done = true;//Done finding file length
+                }
+            }
+        } catch(Exception e){
+            String message = "Error while exporting file: " + e.getMessage();
+        }
+        return (byteLength / (sampleRate*bitsPerSample/8));
     }
 }
 

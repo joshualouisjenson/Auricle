@@ -19,12 +19,14 @@
 
     <!-- Preferences -->
     <string name="preference_category_general">General</string>
-    <string name="preference_category_data">Data</string>
+    <string name="preference_category_audio_features">Audio Features</string>
     <string name="preference_data_buffer_length_title">Buffer length</string>
     <string name="preference_data_buffer_length_dialog">Select a length</string>
     <string name="preference_data_audio_format_title">Audio format</string>
     <string name="preference_data_audio_format_dialog">Select a format</string>
-    <string name="preference_data_voice_text">Voice to text</string>
+    <string name="preference_aec_title">Acoustic Echo Cancellation</string>
+    <string name="preference_ns_title">Noise Suppression</string>
+    <string name="preference_agc_title">Automatic Gain Control</string>
 
     <!-- Other -->
     <string name="mrbUri">https://github.com/oli107/material-range-bar</string>
