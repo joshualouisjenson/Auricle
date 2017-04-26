@@ -4,6 +4,7 @@ package ku.eecscap.team8.auricle;
  * Created by thngu on 4/4/2017.
  */
 
+import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.Manifest;
@@ -17,7 +18,8 @@ import android.content.DialogInterface;
 public class Permission extends AppCompatActivity {
 
     private static String TAG = "Auricle";
-    private static final int RECORD_REQUEST_CODE = 101;
+    public static final int PERMISSIONS_MULTIPLE_REQUEST = 123;
+   // private static final int RECORD_REQUEST_CODE = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,15 +56,17 @@ public class Permission extends AppCompatActivity {
 
     protected void makeRequest() {
         ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.RECORD_AUDIO},
-                RECORD_REQUEST_CODE);
+                new String[]{Manifest.permission.RECORD_AUDIO,
+                        Manifest.permission.MODIFY_AUDIO_SETTINGS,
+                Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                PERMISSIONS_MULTIPLE_REQUEST);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case RECORD_REQUEST_CODE: {
+            case PERMISSIONS_MULTIPLE_REQUEST: {
 
                 if (grantResults.length == 0
                         || grantResults[0] !=

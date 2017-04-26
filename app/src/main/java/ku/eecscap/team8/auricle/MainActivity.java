@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 101);
         AgreeTerms agreement = new AgreeTerms(this);
         agreement.show();
         super.onCreate(savedInstanceState);
@@ -39,10 +40,6 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         app = (Auricle) this.getApplication();
-<<<<<<< HEAD
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 101);
-=======
-
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fabImage = R.drawable.ic_record_24dp;
 
@@ -69,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         // Restore fab image
         fabImage = savedInstanceState.getInt(KEY_FAB_IMAGE);
         fab.setImageResource(fabImage);
->>>>>>> refs/remotes/origin/master
     }
 
 
