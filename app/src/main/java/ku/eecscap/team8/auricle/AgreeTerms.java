@@ -14,6 +14,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 
+
 public class AgreeTerms {
 
     private String EULA_PREFIX = "appeula";

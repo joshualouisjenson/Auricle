@@ -2,7 +2,7 @@ package ku.eecscap.team8.auricle;
 
 /*
  * Created by Joshua Jenson on 2/2/2017.
- * Last Edited by Austin Kurtti on 4/26/2017
+ * Last Edited by Jake Kennedy on 4/26/2017
  */
 
 import android.app.Application;
@@ -26,7 +26,7 @@ public class Auricle extends Application {
     private boolean isRecording = false;
     private int numChannels = 1;
     private int bitsPerSample = 16;
-    private int chunkSizeInSeconds = 2;
+    private int chunkSizeInSeconds = 5;
     private int sampleRate = 44100;
     private int compBitrate = 32000;
 
@@ -64,11 +64,12 @@ public class Auricle extends Application {
 
     protected Map<String,String> getRecorderConfig() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int numChunks = (Integer.parseInt(prefs.getString("buffer_length", "30"))*60/chunkSizeInSeconds) + 1;
 
         String[][] recorderConfigData = new String[][]{
                 //{"useVoiceToText", prefs.getString("voice_text", "false")},
                 {"saveFileType", prefs.getString("audio_format", ".m4a")},
-                {"bufferSize", String.valueOf(sampleRate*numChannels*(bitsPerSample/8) * 60*Integer.parseInt(prefs.getString("buffer_length", "30")))},
+                {"bufferSize", String.valueOf(sampleRate*numChannels*(bitsPerSample/8) * chunkSizeInSeconds * numChunks)},
                 {"dateFormat", "yyyyMMdd_HHmmss"},
                 {"sampleRate", String.valueOf(sampleRate)},
                 {"chunkSizeInSeconds", String.valueOf(chunkSizeInSeconds)},

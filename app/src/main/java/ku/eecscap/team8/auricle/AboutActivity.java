@@ -1,5 +1,7 @@
 package ku.eecscap.team8.auricle;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -15,6 +17,7 @@ import mehdi.sakout.aboutpage.Element;
 
 /**
  * Created by Austin Kurtti on 4/18/2017.
+ * Last Edited by Austin Kurtti on 4/26/2017
  */
 
 public class AboutActivity extends AppCompatActivity {
@@ -44,6 +47,25 @@ public class AboutActivity extends AppCompatActivity {
         }
         versionEl.setTitle("Version " + versionName);
 
+        // EULA element
+        Element eulaEl = new Element();
+        eulaEl.setTitle("Review EULA");
+        eulaEl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext())
+                        .setTitle("EULA")
+                        .setMessage(R.string.eula_string)
+                        .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                builder.create().show();
+            }
+        });
+
         // Configure credit elements
         Element creditEl1 = new Element();
         creditEl1.setTitle("MaterialRangeBar");
@@ -60,6 +82,7 @@ public class AboutActivity extends AppCompatActivity {
                 .setImage(R.mipmap.ic_launcher)
                 .setDescription("Auricle description goes here.")
                 .addItem(versionEl)
+                .addItem(eulaEl)
                 .addGroup("Credits")
                 .addItem(creditEl1)
                 .addItem(creditEl2)

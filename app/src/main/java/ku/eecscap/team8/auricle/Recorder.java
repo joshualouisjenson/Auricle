@@ -34,7 +34,7 @@ import java.util.Map;
 
 /**
  * Created by Joshua Jenson on 11/10/2016.
- * Last Edited by Jake Kennedy on 4/24/2017
+ * Last Edited by Jake Kennedy on 4/26/2017
  */
 
 public class Recorder {
@@ -43,7 +43,7 @@ public class Recorder {
     =============================================================================*/
     private AudioRecord recorder;
     private Thread activeThread;
-
+    
     private Auricle app;
     private Map<String,String> config;
     private SimpleDateFormat autoDateFormat;
@@ -57,6 +57,8 @@ public class Recorder {
     private int compBitrate;
     private int chunkSizeInSeconds;
     private int fileSize;
+    private int BufEnd;
+    private boolean BufLooped;
     private boolean useAEC, useNS, useAGC;
 
     /*=============================================================================
@@ -121,6 +123,8 @@ public class Recorder {
             boolean done = false;
             boolean looped = false;
             int i=0;
+            BufLooped = false;
+            BufEnd = 0;
             while(!done) {
                 //Iterate through each buffer chunk, then cycle back
                 i++;
@@ -134,7 +138,12 @@ public class Recorder {
                 }
                 fileOut.close();
                 if( !app.getRecordingState() ){
+                    if(!looped)
+                    {
+                        fileSize += written;
+                    }
                     done = true;//Stopped Recording
+                    BufEnd = i;
                 }else if(!looped && i != numChunks) {
                     //not looped, add to fileSize
                     fileSize += written;
@@ -142,10 +151,11 @@ public class Recorder {
                     // Still Recording and buffer is full, set i = 0 so next file is temp1.pcm
                     i=0;
                     looped = true;//Flag set so we know that the entire buffer is used
+                    BufLooped = true;
                 }
             }
             
-            mergeBuf(looped,i);
+            //mergeBuf(looped,i);
 
             //Temporary test case for file, ignore
             //int start = 88200*5;
@@ -167,12 +177,18 @@ public class Recorder {
         }
     }
 
-    protected int mergeBuf(boolean looped, int end){
+    private String mergeAndTrim(int startByte, int endByte, boolean looped, int end){
         int byteBufferSize = 128;
-
+        String trimmedFile = "trimmedTemp.pcm";// + Integer.toString(25) + ".pcm";
         //Now loop over every one
         try {
             //Open the local file stream
+            File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Auricle/logMaT.txt");
+            FileOutputStream log = new FileOutputStream(externalFile);
+            String message = "Log MaT:\nStart: " + startByte +" - End: " + endByte + "\n";
+            log.write((message).getBytes());
+
+
             int start;
             if(looped){
                 start = (end % numChunks) + 1;
@@ -180,30 +196,54 @@ public class Recorder {
                 start = 1;
             }
 
-            String externalFile = "temp.pcm";// + Integer.toString(25) + ".pcm";
-            BufferedOutputStream buffOut = new BufferedOutputStream(app.openFileOutput(externalFile, Context.MODE_PRIVATE));
+            BufferedOutputStream buffOut = new BufferedOutputStream(app.openFileOutput(trimmedFile, Context.MODE_PRIVATE));
 
             FileInputStream localFileStream;
             boolean done = false;
             while(!done) {
+                //For each file, check if the file size is less than the startByte
                 String name = "temp" + Integer.toString(start) + ".pcm";
-                localFileStream = app.openFileInput(name);
-                
-                byte[] buf = new byte[byteBufferSize];
-                int bytesRead = 0;
-                while (bytesRead >= 0) {
-                    //Read data from the internal tempI.pcm file
-                    bytesRead = localFileStream.read(buf, 0, byteBufferSize);
-                    //Write that data to the temp.pcm file
-                    buffOut.write(buf, 0, byteBufferSize);
-                }
+                message = "i: " + start + " - Length: " + chunkSize + " - Start: " + startByte +" - End: " + endByte;
+                log.write((message).getBytes());
+                if(chunkSize <= startByte){
+                    //File Not used, decrease startByte and end Byte
+                    log.write(("  --  Case 1\n").getBytes());
+                    startByte = startByte - chunkSize;
+                    endByte = endByte - chunkSize;
+                }else if(endByte <= 0) {
+                    log.write(("  --  Case 2\n").getBytes());
+                    //Remaining files not used, done
+                    done = true;
+                }else {
+                    log.write(("  --  Case 3\n").getBytes());
+                    //File is used, write to trimmedTemp.pcm
+                    //Set startByte and endByte
+                    startByte = 0;
+                    endByte = endByte - chunkSize;
 
-                localFileStream.close();
-                if(start != end){
+                    //Open File Stream and begin writing
+                    localFileStream = app.openFileInput(name);
+
+                    byte[] buf = new byte[byteBufferSize];
+                    int bytesRead = 0;
+                    while (bytesRead >= 0) {
+                        //Read data from the internal tempI.pcm file
+                        bytesRead = localFileStream.read(buf, 0, byteBufferSize);
+                        //Write that data to the temp.pcm file
+                        buffOut.write(buf, 0, byteBufferSize);
+                    }
+
+                    localFileStream.close();
+                }
+                //Always delete the local file
+                deleteLocalFile(name);
+
+                if (start != end) {
                     start = (start % numChunks) + 1;//set start to next int in the circular buffer
-                }else{
+                } else {
                     done = true;//Done copying files
                 }
+
             }
 
             buffOut.close();
@@ -211,40 +251,7 @@ public class Recorder {
         } catch(Exception e){
             String message = "Error while exporting file: " + e.getMessage();
         }
-        int dataLength = (int) new File(app.getFilesDir().getAbsolutePath()+"/temp.pcm").length();
-        return dataLength/(sampleRate*bitsPerSample/8);
-    }
-
-    //Temporary, not final yet
-    private String trimFile(String fileName, int startByte, int endByte){
-        int byteBufferSize = 128;
-
-        String trimmedFileName = "trimmed_"+fileName;
-        byte byteBuf[] = new byte[byteBufferSize];
-
-        try {
-            FileInputStream localFileStream = app.openFileInput(fileName);
-            BufferedOutputStream os = new BufferedOutputStream(app.openFileOutput(trimmedFileName, Context.MODE_PRIVATE));
-            int written = 0;
-            //First read and do nothing with first startByte bytes
-            while (written < startByte) {
-                localFileStream.read(byteBuf, 0, byteBufferSize);
-                written += byteBufferSize;
-            }
-
-            //Next read and write the next (endBytes-startBytes) bytes
-            written=0;
-            while(written < (endByte-startByte)){
-                localFileStream.read(byteBuf,0,byteBufferSize);
-                os.write(byteBuf,0,byteBufferSize);
-                written += byteBufferSize;
-            }
-        }catch(Exception e){
-            String message = "Error while exporting file: " + e.getMessage();
-        }
-
-        deleteLocalFile("temp.pcm");
-        return trimmedFileName;
+        return trimmedFile;
     }
 
     private String getSaveFileName() {
@@ -258,23 +265,28 @@ public class Recorder {
         String internalWavFileName = "";
         switch (saveFileType) {
             case ".m4a":
-                dataFileName = trimFile(dataFileName, startByte, endByte);
+                String uncompFileName = mergeAndTrim(startByte, endByte, BufLooped, BufEnd);
+                String compFileName = finalFileName + ".m4a";
+
                 try {
                     File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Auricle/loge.txt");
                     FileOutputStream log = new FileOutputStream(externalFile);
                     String message = "Start: " + startByte +"\nEnd: " + endByte;
                     log.write((message).getBytes());
                 }catch(Exception e){}
-                compressFile(dataFileName,finalFileName + ".m4a");
-                exportLocalFileExternal(finalFileName + ".m4a", finalFileName + ".m4a");
-                decompressInternalFile("helloWorld.pcm",finalFileName + ".m4a");
-                internalWavFileName = internalWAV("helloWorld.pcm");
-                if(internalWavFileName != "") exportLocalFileExternal(internalWavFileName,"helloWorld.wav");
+                
+                //Compression
+                compressFile(uncompFileName,compFileName);
+                exportLocalFileExternal(compFileName,compFileName);//For Testing
 
-                getFileList();
+                //exportLocalFileExternal(finalFileName + ".m4a", finalFileName + ".m4a");
+                //decompressInternalFile("helloWorld.pcm",finalFileName + ".m4a");
+                //internalWavFileName = internalWAV("helloWorld.pcm");
+                //if(internalWavFileName != "") exportLocalFileExternal(internalWavFileName,"helloWorld.wav");
+                getFileList();//For Testing
                 break;
             case ".wav":
-                dataFileName = trimFile(dataFileName, startByte, endByte);
+                dataFileName = mergeAndTrim(startByte, endByte, BufLooped, BufEnd);
                 try {
                     File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Auricle/loge.txt");
                     FileOutputStream log = new FileOutputStream(externalFile);
@@ -568,6 +580,7 @@ public class Recorder {
         }
     }
 
+    //Decompression not used anymore
     private void decompressInternalFile(String rawOutputFileName, String compInputFileName){
         //String nameLog = "log.txt";
         //Init constants
@@ -722,4 +735,3 @@ public class Recorder {
         return (fileSize / (sampleRate*bitsPerSample/8));
     }
 }
-
