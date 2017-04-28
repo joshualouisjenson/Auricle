@@ -14,7 +14,7 @@ import android.util.Log;
 import android.support.v4.app.ActivityCompat;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-//ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 101);
+
 public class Permission extends AppCompatActivity {
 
     private static String TAG = "Auricle";
@@ -26,16 +26,94 @@ public class Permission extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.request_permission);
 
-        int permission = ContextCompat.checkSelfPermission(this,
+        int permission1 = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.RECORD_AUDIO);
 
-        if (permission != PackageManager.PERMISSION_GRANTED) {
+        int permission2 = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.MODIFY_AUDIO_SETTINGS);
+
+        int permission3 = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        int permission4 = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission1 != PackageManager.PERMISSION_GRANTED) {
             Log.i(TAG, "Permission to record denied");
 
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.RECORD_AUDIO)) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Permission to access the microphone is required for this app to record audio.")
+                        .setTitle("Permission required");
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.i(TAG, "Clicked");
+                        makeRequest();
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            } else {
+                makeRequest();
+            }
+        }
+        if (permission2 != PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG, "Permission to modify audio denied");
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.MODIFY_AUDIO_SETTINGS)) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Permission to modify audio is required for this app.")
+                        .setTitle("Permission required");
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.i(TAG, "Clicked");
+                        makeRequest();
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            } else {
+                makeRequest();
+            }
+        }
+        if (permission3 != PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG, "Permission to read external storage denied");
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Permission to read external storage is required for this app.")
+                        .setTitle("Permission required");
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.i(TAG, "Clicked");
+                        makeRequest();
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            } else {
+                makeRequest();
+            }
+        }
+        if (permission4 != PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG, "Permission to record denied");
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Permission to write to external storage is required for this app.")
                         .setTitle("Permission required");
 
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
