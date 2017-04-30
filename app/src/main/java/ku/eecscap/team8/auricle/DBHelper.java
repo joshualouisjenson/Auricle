@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 /**
  * Created by Austin Kurtti on 4/23/2017.
- * Last Edited by Austin Kurtti on 4/26/2017
+ * Last Edited by Austin Kurtti on 4/30/2017
  */
 
 public class DBHelper extends SQLiteOpenHelper {
@@ -21,6 +21,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String LISTING_COLUMN_FORMAT = "format";
     public static final String LISTING_COLUMN_LENGTH = "length";
     public static final String LISTING_COLUMN_DATE_CREATED = "date_created";
+    public static final String LISTING_COLUMN_DATE_CREATED_MILLI = "date_created_milli";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -29,7 +30,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + LISTING_TABLE_NAME + " (" + LISTING_COLUMN_LISTING_ID + " INTEGER PRIMARY KEY, " + LISTING_COLUMN_FILENAME + " TEXT, " +
-                LISTING_COLUMN_FORMAT + " TEXT, " + LISTING_COLUMN_LENGTH + " TEXT, " + LISTING_COLUMN_DATE_CREATED + " TEXT)");
+                LISTING_COLUMN_FORMAT + " TEXT, " + LISTING_COLUMN_LENGTH + " TEXT, " + LISTING_COLUMN_DATE_CREATED + " TEXT, " + LISTING_COLUMN_DATE_CREATED_MILLI + " INTEGER)");
     }
 
     /**
@@ -42,30 +43,22 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public Cursor getListingData() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor result = db.rawQuery("SELECT * FROM " + LISTING_TABLE_NAME, null);
+        Cursor result = db.rawQuery("SELECT * FROM " + LISTING_TABLE_NAME + " ORDER BY " + LISTING_COLUMN_DATE_CREATED_MILLI + " DESC", null);
         result.moveToFirst();
         return result;
     }
 
-    public void insertListingItem(String filename, String format, String length, String date_created) {
+    public void insertListingItem(String filename, String format, String length, String dateCreated) {
+        int millis = (int) System.currentTimeMillis();
+
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(LISTING_COLUMN_FILENAME, filename);
         values.put(LISTING_COLUMN_FORMAT, format);
         values.put(LISTING_COLUMN_LENGTH, length);
-        values.put(LISTING_COLUMN_DATE_CREATED, date_created);
+        values.put(LISTING_COLUMN_DATE_CREATED, dateCreated);
+        values.put(LISTING_COLUMN_DATE_CREATED_MILLI, millis);
         db.insert(LISTING_TABLE_NAME, null, values);
-    }
-
-    public void updateListingItem(int id, String filename, String format, String length, String date_created) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        if(filename != null) { values.put(LISTING_COLUMN_FILENAME, filename); }
-        if(format != null) { values.put(LISTING_COLUMN_FORMAT, format); }
-        if(length != null) { values.put(LISTING_COLUMN_LENGTH, length); }
-        if(date_created != null) { values.put(LISTING_COLUMN_DATE_CREATED, date_created); }
-        String args[] = {Integer.toString(id)};
-        db.update(LISTING_TABLE_NAME, values, LISTING_COLUMN_LISTING_ID + " = ?", args);
     }
 
     public void deleteListingItem(int id) {
