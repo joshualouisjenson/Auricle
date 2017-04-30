@@ -26,7 +26,7 @@ public class Auricle extends Application {
     private boolean isRecording = false;
     private int numChannels = 1;
     private int bitsPerSample = 16;
-    private int chunkSizeInSeconds = 5;
+    private int chunkSizeInSeconds = 1;
     private int sampleRate = 44100;
     private int compBitrate = 32000;
 
