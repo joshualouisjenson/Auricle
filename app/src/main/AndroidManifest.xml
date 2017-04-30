@@ -30,12 +30,13 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/action_settings"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
         <activity
             android:name=".AboutActivity"
             android:label="@string/action_about"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".AudioPlayer"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>
