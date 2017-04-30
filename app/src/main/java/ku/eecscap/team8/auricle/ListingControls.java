@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +18,7 @@ import java.io.IOException;
 
 /**
  * Created by Austin Kurtti on 4/29/2017.
- * Last Edited by Austin Kurtti on 4/29/2017
+ * Last Edited by Austin Kurtti on 4/30/2017
  */
 
 public class ListingControls {
@@ -25,6 +26,7 @@ public class ListingControls {
     private Activity mActivity;
     private Context mContext;
     private DBHelper dbHelper;
+    private Utilities utilities;
 
     private MediaPlayer mediaPlayer;
     boolean playing = false, started = false, fileLoaded = false;
@@ -33,10 +35,11 @@ public class ListingControls {
         mActivity = (Activity) ctx;
         mContext = ctx;
         dbHelper = new DBHelper(ctx);
+        utilities = new Utilities(ctx);
         mediaPlayer = new MediaPlayer();
     }
 
-    public void show(final int listingId, final String path, String filename, String dateCreated, String length) {
+    public void show(final View rootView, final int listingId, final String path, final String filename, String dateCreated, String length) {
         // Get full file path
         final String fullPath = path + "/" + filename;
 
@@ -54,6 +57,7 @@ public class ListingControls {
                         dbHelper.deleteListingItem(listingId);
                         File file = new File(fullPath);
                         file.delete();
+                        // TODO: refresh listing
                     }
                 })
                 .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -83,6 +87,27 @@ public class ListingControls {
                 playback.setImageResource(R.drawable.ic_play_arrow_24dp);
                 playing = false;
                 started = false;
+            }
+        });
+
+        // Disable orientation changes
+        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        // Build dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext)
+                .setTitle(filename)
+                .setView(dialogView);
+        final AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                // Restore orientation changes
+                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+
+                // Stop and release media player
+                mediaPlayer.stop();
+                mediaPlayer.release();
             }
         });
 
@@ -125,7 +150,13 @@ public class ListingControls {
         export.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: export
+                // Dismiss dialog and export file
+                dialog.dismiss();
+                boolean success = utilities.exportLocalFileExternal(filename, filename);
+
+                // Display success/fail message
+                String exportMessage = success ? "File export successful" : "Unable to export file";
+                Snackbar.make(rootView, exportMessage, Snackbar.LENGTH_SHORT).show();
             }
         });
         delete.setOnClickListener(new View.OnClickListener() {
@@ -136,26 +167,7 @@ public class ListingControls {
             }
         });
 
-        // Disable orientation changes
-        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        // Build and show dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext)
-                .setTitle(filename)
-                .setView(dialogView);
-        final AlertDialog dialog = builder.create();
-        dialog.setCanceledOnTouchOutside(true);
-        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                // Restore orientation changes
-                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-
-                // Stop and release media player
-                mediaPlayer.stop();
-                mediaPlayer.release();
-            }
-        });
+        // Show dialog
         dialog.show();
     }
 }

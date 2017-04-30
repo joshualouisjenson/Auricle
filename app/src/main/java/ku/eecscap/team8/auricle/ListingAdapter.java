@@ -11,13 +11,14 @@ import java.io.File;
 
 /**
  * Created by Austin Kurtti on 4/23/2017.
- * Last Edited by Austin Kurtti on 4/29/2017
+ * Last Edited by Austin Kurtti on 4/30/2017
  */
 
 public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHolder> {
 
     private ListingHelper[] mDataSet;
     private Context mContext;
+    private View rootView;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvFilename, tvLength, tvDateCreated;
@@ -29,9 +30,10 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHold
         }
     }
 
-    public ListingAdapter(ListingHelper[] dataSet, Context ctx) {
+    public ListingAdapter(ListingHelper[] dataSet, Context ctx, View view) {
         mDataSet = dataSet;
         mContext = ctx;
+        rootView = view;
     }
 
     @Override
@@ -55,7 +57,7 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHold
             public void onClick(View view) {
                 String path = mContext.getFilesDir().getAbsolutePath();
                 ListingControls controls = new ListingControls(mContext);
-                controls.show(listingId, path, fullFile, dateCreated, length);
+                controls.show(rootView, listingId, path, fullFile, dateCreated, length);
             }
         });
 
