@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -51,7 +52,8 @@ public class ListingControls {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dbHelper.deleteListingItem(listingId);
-                        // TODO: delete actual file too
+                        File file = new File(fullPath);
+                        file.delete();
                     }
                 })
                 .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
