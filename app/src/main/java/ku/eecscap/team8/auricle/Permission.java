@@ -30,7 +30,7 @@ public class Permission extends AppCompatActivity {
                 Manifest.permission.RECORD_AUDIO);
 
         int permission2 = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.MODIFY_AUDIO_SETTINGS);
+                Manifest.permission.INTERNET);
 
         int permission3 = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -62,12 +62,12 @@ public class Permission extends AppCompatActivity {
             }
         }
         if (permission2 != PackageManager.PERMISSION_GRANTED) {
-            Log.i(TAG, "Permission to modify audio denied");
+            Log.i(TAG, "Permission to access internet denied");
 
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.MODIFY_AUDIO_SETTINGS)) {
+                    Manifest.permission.INTERNET)) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Permission to modify audio is required for this app.")
+                builder.setMessage("Permission to access internet is required for this app.")
                         .setTitle("Permission required");
 
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -135,7 +135,7 @@ public class Permission extends AppCompatActivity {
     protected void makeRequest() {
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.MODIFY_AUDIO_SETTINGS,
+                        Manifest.permission.INTERNET,
                 Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 PERMISSIONS_MULTIPLE_REQUEST);
     }
