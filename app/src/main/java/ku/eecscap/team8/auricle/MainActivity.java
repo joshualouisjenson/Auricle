@@ -18,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.support.v4.app.ActivityCompat;
 import android.Manifest;
-import android.widget.MediaController;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -50,9 +49,6 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.content_main_frame, listingFragment);
         transaction.commit();
-
-        MediaController mediaController = new MediaController(this);
-        mediaController.show();
     }
 
     @Override

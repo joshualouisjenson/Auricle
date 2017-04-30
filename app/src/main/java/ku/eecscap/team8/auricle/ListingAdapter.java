@@ -1,24 +1,17 @@
 package ku.eecscap.team8.auricle;
 
 import android.content.Context;
-import android.content.Intent;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.Environment;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.MediaController;
 import android.widget.TextView;
 
 import java.io.File;
 
 /**
  * Created by Austin Kurtti on 4/23/2017.
- * Last Edited by Austin Kurtti on 4/26/2017
+ * Last Edited by Austin Kurtti on 4/29/2017
  */
 
 public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHolder> {
@@ -55,20 +48,14 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHold
         final String length = mDataSet[position].getLength();
         final String dateCreated = mDataSet[position].getDateCreated();
         final String fullFile = filename + format;
-        final String AUDIO_FILE_NAME = mContext.getFilesDir().getAbsolutePath() + "/" + filename;
 
         // set listener for tapping on listing item
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: playback popup
                 String path = mContext.getFilesDir().getAbsolutePath();
-                path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/Auricle/fffff.m4a";
-
-                Intent intent = new Intent(mContext, AudioPlayer.class);
-                intent.putExtra("filepath", path);
-                mContext.startActivity(intent);
-//                Snackbar.make(view, "Clicked on: " + filename, Snackbar.LENGTH_SHORT).show();
+                ListingControls controls = new ListingControls(mContext);
+                controls.show(listingId, path, fullFile, dateCreated, length);
             }
         });
 
