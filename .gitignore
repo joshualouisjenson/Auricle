@@ -7,3 +7,4 @@ local.properties
 /build
 /captures
 .externalNativeBuild
+app/src/main/java/ku/eecscap/team8/auricle/MainActivity.java
