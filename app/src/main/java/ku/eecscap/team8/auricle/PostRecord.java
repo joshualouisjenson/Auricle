@@ -142,9 +142,11 @@ public class PostRecord {
         }else if(fileLength >= 2500){
             //File length over 41 minutes, set tick interval to 10 sec
             tickInt = 10;
-        }else{
-            //Set tick interval to 5 seconds
+        }else if(fileLength >= 60){
+            //File length over a minute, set tick interval to 5 seconds
             tickInt = 5;
+        }else{
+            tickInt = 1;
         }
 
         rangeBar.setTickInterval(tickInt);
