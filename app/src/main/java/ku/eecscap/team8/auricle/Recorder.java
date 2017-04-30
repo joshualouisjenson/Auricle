@@ -277,7 +277,6 @@ public class Recorder {
                 
                 //Compression
                 compressFile(uncompFileName,compFileName);
-                exportLocalFileExternal(compFileName,compFileName);//For Testing
 
                 //exportLocalFileExternal(finalFileName + ".m4a", finalFileName + ".m4a");
                 //decompressInternalFile("helloWorld.pcm",finalFileName + ".m4a");
@@ -295,14 +294,12 @@ public class Recorder {
                 }catch(Exception e){}
                 internalWavFileName = internalWAV(dataFileName);
                 getFileList(); // for debugging
-                if(internalWavFileName != "") exportLocalFileExternal(internalWavFileName, finalFileName + ".wav");
                 break;
             default:
                 //No Trimming, and does both wav and m4a file saving to acknowledge it is neither
                 //trimFile(dataFileName, startByte, endByte);
                 internalWavFileName = internalWAV(dataFileName);
                 getFileList(); // for debugging
-                if(internalWavFileName != "") exportLocalFileExternal(internalWavFileName, finalFileName + ".wav");
                 compressFile(dataFileName,finalFileName + ".m4a");
                 break;
         }
@@ -410,44 +407,6 @@ public class Recorder {
 
         } catch(Exception e){
             String message = "Error while saving .wav file: " + e.getMessage();
-        }
-    }
-
-    //Exports a local file (specified by local filename) to the external Auricle directory
-    private void exportLocalFileExternal(String localFilename, String externalFileName){
-
-        String externalFileFolderName = "Auricle/";
-
-        try {
-            //Open the local file stream
-            FileInputStream localFileStream = app.openFileInput(localFilename);
-
-            //Create the Auricle Directory if it doesnt already exist
-            File auricleDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), externalFileFolderName);
-            auricleDirectory.mkdir();
-            //Create the external file
-            externalFileName = externalFileFolderName + externalFileName;
-            File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), externalFileName);
-
-            //Create the external file stream
-            BufferedOutputStream buffOut = new BufferedOutputStream(new FileOutputStream(externalFile));
-            byte[] buf = new byte[256];//buffer of length 256 I guess
-            int bytesRead = 0;
-            while(bytesRead >= 0)
-            {
-                //Read data from the internal file
-                bytesRead = localFileStream.read(buf);
-                //Write that data to the external file
-                buffOut.write(buf);
-            }
-
-            localFileStream.close();
-            buffOut.close();
-
-            //app.sendEmailWithFileAttachment(externalFile, externalFileName); // TODO: this is just testing code for export, remove this and implement it within the listing once it's done
-
-        } catch(Exception e){
-            String message = "Error while exporting file: " + e.getMessage();
         }
     }
 

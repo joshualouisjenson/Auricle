@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 
 /**
  * Created by Austin Kurtti on 4/23/2017.
- * Last Edited by Austin Kurtti on 4/26/2017
+ * Last Edited by Austin Kurtti on 4/30/2017
  */
 
 public class ListingFragment extends Fragment {
@@ -60,7 +60,7 @@ public class ListingFragment extends Fragment {
         mCurrentLayoutManagerType = LayoutManagerType.LINEAR;
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
-        mAdapter = new ListingAdapter(mDataSet, getContext());
+        mAdapter = new ListingAdapter(mDataSet, getContext(), rootView);
         mRecyclerView.setAdapter(mAdapter);
 
         return rootView;
