@@ -60,7 +60,7 @@ public class ListingFragment extends Fragment {
         mCurrentLayoutManagerType = LayoutManagerType.LINEAR;
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
-        mAdapter = new ListingAdapter(mDataSet);
+        mAdapter = new ListingAdapter(mDataSet, getContext());
         mRecyclerView.setAdapter(mAdapter);
 
         return rootView;

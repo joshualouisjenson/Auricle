@@ -18,7 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.support.v4.app.ActivityCompat;
 import android.Manifest;
-
+import android.widget.MediaController;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -32,9 +32,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 101);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.MODIFY_AUDIO_SETTINGS, Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE}, 123);
         AgreeTerms agreement = new AgreeTerms(this);
         agreement.show();
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 101);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -47,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.content_main_frame, listingFragment);
         transaction.commit();
+
+        MediaController mediaController = new MediaController(this);
+        mediaController.show();
     }
 
     @Override
@@ -106,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.action_settings) {
             Intent settingsIntent = new Intent(this, SettingsActivity.class);
             startActivity(settingsIntent);

@@ -28,6 +28,7 @@ public class PostRecord {
     private Utilities utilities;
     private ListingFragment listingFragment;
     private int leftSeconds = 0, rightSeconds = 0;
+    private int tickInt = 5;
 
     public PostRecord(Auricle app, Activity context, Fragment fragment) {
         mApp = app;
@@ -58,10 +59,33 @@ public class PostRecord {
         rangeBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onRangeChangeListener(RangeBar bar, int lpIndex, int rpIndex, String lpValue, String rpValue) {
-                leftSeconds = lpIndex;
-                rightSeconds = rpIndex;
+                leftSeconds = lpIndex*tickInt;
+                rightSeconds = rpIndex*tickInt;
             }
         });
+
+        // Build wait dialog, which refreshes listing and restores orientation sensing on dismissal
+        final View waitView = inflater.inflate(R.layout.dialog_wait, null);
+        AlertDialog.Builder wait = new AlertDialog.Builder(mContext)
+                .setTitle(R.string.wait_message)
+                .setView(waitView);
+        final AlertDialog waitDialog = wait.create();
+        waitDialog.setCanceledOnTouchOutside(false);
+        waitDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                listingFragment.refresh();
+                mContext.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+            }
+        });
+
+        // Setup callback for when saving audio is finished
+        final Callback doneCallback = new Callback() {
+            @Override
+            public void callback() {
+                waitDialog.dismiss();
+            }
+        };
 
         // Disable orientation changes to prevent parent activity reinitialization
         mContext.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -73,40 +97,33 @@ public class PostRecord {
                 .setPositiveButton(R.string.save, new Dialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        // Save the clip
+                        // Save metadata in db
                         String filename = clipFilename.getText().toString();
                         dbHelper.insertListingItem(filename, mApp.getAudioFormatFromPrefs(),
                                 utilities.getTimeFromSeconds((rightSeconds - leftSeconds)), utilities.getCurrentDate());
-                        mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
 
-                        // Refresh listing
-                        listingFragment.refresh();
-
-                        // Close dialog
+                        // Close dialog and show wait message
                         dialogInterface.dismiss();
+                        waitDialog.show();
 
-                        // Restore device orientation detection
-                        mContext.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+                        // Start runnable
+                        new Thread(new PostRecordRunnable(doneCallback, mApp, filename, leftSeconds, rightSeconds)).start();
                     }
                 })
-                .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.default_text, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        // Save the clip with a default filename
+                        // Save metadata in db
                         String filename = "AuricleRecording-" + utilities.getTimestampFilename();
                         dbHelper.insertListingItem(filename, mApp.getAudioFormatFromPrefs(),
                                 utilities.getTimeFromSeconds((rightSeconds - leftSeconds)), utilities.getCurrentDate());
-                        mApp.saveRecordingAs(filename, leftSeconds, rightSeconds);
 
-
-                        // Refresh listing
-                        listingFragment.refresh();
-
-                        // Close dialog
+                        // Close dialog and show wait message
                         dialogInterface.dismiss();
+                        waitDialog.show();
 
-                        // Restore device orientation detection
-                        mContext.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+                        // Start runnable
+                        new Thread(new PostRecordRunnable(doneCallback, mApp, filename, leftSeconds, rightSeconds)).start();
                     }
                 });
         final AlertDialog dialog = builder.create();
@@ -114,9 +131,24 @@ public class PostRecord {
         dialog.show();
 
         // Set range bar tick settings
+        int fileLength = mApp.getFileLengthInSeconds();
         rangeBar.setTickStart(0);
-        rangeBar.setTickInterval(1);
-        rangeBar.setTickEnd(mApp.getFileLengthInSeconds());
+        rangeBar.setTickEnd(fileLength);
+        //Compute Tick interval
+        //get chunk size = min tick interval
+        if(fileLength >= 5000){
+            //File length over 83 minutes, set tick interval to 15 sec
+            tickInt = 15;
+        }else if(fileLength >= 2500){
+            //File length over 41 minutes, set tick interval to 10 sec
+            tickInt = 10;
+        }else{
+            //Set tick interval to 5 seconds
+            tickInt = 5;
+        }
+
+        rangeBar.setTickInterval(tickInt);
+
 
         // Disable Save button initially; allow valid filename to enable it
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
