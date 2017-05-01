@@ -183,12 +183,6 @@ public class Recorder {
         //Now loop over every one
         try {
             //Open the local file stream
-            File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Auricle/logMaT.txt");
-            FileOutputStream log = new FileOutputStream(externalFile);
-            String message = "Log MaT:\nStart: " + startByte +" - End: " + endByte + "\n";
-            log.write((message).getBytes());
-
-
             int start;
             if(looped){
                 start = (end % numChunks) + 1;
@@ -203,19 +197,14 @@ public class Recorder {
             while(!done) {
                 //For each file, check if the file size is less than the startByte
                 String name = "temp" + Integer.toString(start) + ".pcm";
-                message = "i: " + start + " - Length: " + chunkSize + " - Start: " + startByte +" - End: " + endByte;
-                log.write((message).getBytes());
                 if(chunkSize <= startByte){
                     //File Not used, decrease startByte and end Byte
-                    log.write(("  --  Case 1\n").getBytes());
                     startByte = startByte - chunkSize;
                     endByte = endByte - chunkSize;
                 }else if(endByte <= 0) {
-                    log.write(("  --  Case 2\n").getBytes());
                     //Remaining files not used, done
                     done = true;
                 }else {
-                    log.write(("  --  Case 3\n").getBytes());
                     //File is used, write to trimmedTemp.pcm
                     //Set startByte and endByte
                     startByte = 0;
@@ -267,39 +256,29 @@ public class Recorder {
             case ".m4a":
                 String uncompFileName = mergeAndTrim(startByte, endByte, BufLooped, BufEnd);
                 String compFileName = finalFileName + ".m4a";
-
-                try {
-                    File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Auricle/loge.txt");
-                    FileOutputStream log = new FileOutputStream(externalFile);
-                    String message = "Start: " + startByte +"\nEnd: " + endByte;
-                    log.write((message).getBytes());
-                }catch(Exception e){}
                 
                 //Compression
                 compressFile(uncompFileName,compFileName);
+                //exportLocalFileExternal(compFileName,compFileName);//For Testing
 
                 //exportLocalFileExternal(finalFileName + ".m4a", finalFileName + ".m4a");
                 //decompressInternalFile("helloWorld.pcm",finalFileName + ".m4a");
                 //internalWavFileName = internalWAV("helloWorld.pcm");
                 //if(internalWavFileName != "") exportLocalFileExternal(internalWavFileName,"helloWorld.wav");
-                getFileList();//For Testing
+                //getFileList();//For Testing
                 break;
             case ".wav":
                 dataFileName = mergeAndTrim(startByte, endByte, BufLooped, BufEnd);
-                try {
-                    File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Auricle/loge.txt");
-                    FileOutputStream log = new FileOutputStream(externalFile);
-                    String message = "Start: " + startByte +"\nEnd: " + endByte;
-                    log.write((message).getBytes());
-                }catch(Exception e){}
                 internalWavFileName = internalWAV(dataFileName);
-                getFileList(); // for debugging
+                //getFileList(); // for debugging
+                //if(internalWavFileName != "") exportLocalFileExternal(internalWavFileName, finalFileName + ".wav");
                 break;
             default:
                 //No Trimming, and does both wav and m4a file saving to acknowledge it is neither
                 //trimFile(dataFileName, startByte, endByte);
                 internalWavFileName = internalWAV(dataFileName);
-                getFileList(); // for debugging
+                //getFileList(); // for debugging
+                //if(internalWavFileName != "") exportLocalFileExternal(internalWavFileName, finalFileName + ".wav");
                 compressFile(dataFileName,finalFileName + ".m4a");
                 break;
         }
@@ -527,15 +506,7 @@ public class Recorder {
             mux.release();
 
         } catch(Exception e){
-            try {
-                //Way to write errors to log file
-                File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Auricle/loge.txt");
-                FileOutputStream log = new FileOutputStream(externalFile);
-                String message = "Error while exporting file: " + e.getMessage();
-                log.write((message).getBytes());
-            }catch (Exception e1){
 
-            }
         }
     }
 
@@ -662,15 +633,7 @@ public class Recorder {
             codec.stop();
 
         } catch(Exception e){
-            try {
-                //Way to write errors to log file
-                File externalFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Auricle/logerts.txt");
-                FileOutputStream log = new FileOutputStream(externalFile);
-                String message = "Error while exporting file: " + e.getMessage();
-                log.write((message).getBytes());
-            }catch (Exception e1){
 
-            }
         }
     }
 
