@@ -21,6 +21,7 @@ public class ListingFragment extends Fragment {
     private static final int SPAN_COUNT = 2;
 
     protected DBHelper dbHelper;
+    private ListingFragment listingFragment;
 
     private enum LayoutManagerType {
         GRID,
@@ -60,7 +61,9 @@ public class ListingFragment extends Fragment {
         mCurrentLayoutManagerType = LayoutManagerType.LINEAR;
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
-        mAdapter = new ListingAdapter(mDataSet, getContext(), rootView);
+        listingFragment = (ListingFragment) getFragmentManager().findFragmentByTag("LISTING_FRAGMENT");
+
+        mAdapter = new ListingAdapter(mDataSet, getContext(), rootView, listingFragment);
         mRecyclerView.setAdapter(mAdapter);
 
         return rootView;

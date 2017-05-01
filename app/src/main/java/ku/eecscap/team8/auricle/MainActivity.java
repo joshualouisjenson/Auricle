@@ -2,7 +2,7 @@ package ku.eecscap.team8.auricle;
 
 /**
  * Created by Austin Kurtti on 11/16/2016
- * Last Edited by Austin Kurtti on 4/26/2017
+ * Last Edited by Austin Kurtti on 4/30/2017
  */
 
 import android.content.Intent;
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         listingFragment = new ListingFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.content_main_frame, listingFragment);
+        transaction.replace(R.id.content_main_frame, listingFragment, "LISTING_FRAGMENT");
         transaction.commit();
     }
 

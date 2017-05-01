@@ -39,34 +39,13 @@ public class ListingControls {
         mediaPlayer = new MediaPlayer();
     }
 
-    public void show(final View rootView, final int listingId, final String path, final String filename, String dateCreated, String length) {
+    public void show(final View rootView, final ListingFragment listingFragment, final int listingId, final String path, final String filename, String dateCreated, String length) {
         // Get full file path
         final String fullPath = path + "/" + filename;
 
         // Inflate dialog layout into view
         LayoutInflater inflater = LayoutInflater.from(mContext);
         final View dialogView = inflater.inflate(R.layout.listing_controls, null);
-
-        // Build delete dialog
-        AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(mContext)
-                .setTitle("Confirm delete")
-                .setMessage("Are you sure you want to delete " + filename + "? This is an a permanent action and cannot be undone.")
-                .setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dbHelper.deleteListingItem(listingId);
-                        File file = new File(fullPath);
-                        file.delete();
-                        // TODO: refresh listing
-                    }
-                })
-                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        final AlertDialog deleteDialog = deleteBuilder.create();
 
         // Get text views and buttons from dialog
         TextView tvDateCreated = (TextView) dialogView.findViewById(R.id.listing_controls_date_created);
@@ -110,6 +89,33 @@ public class ListingControls {
                 mediaPlayer.release();
             }
         });
+
+        // Build delete dialog
+        AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(mContext)
+                .setTitle("Confirm delete")
+                .setMessage("Are you sure you want to delete " + filename + "? This is an a permanent action and cannot be undone.")
+                .setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        // Delete db record and actual file
+                        dbHelper.deleteListingItem(listingId);
+                        File file = new File(fullPath);
+                        file.delete();
+
+                        // Close dialogs and refresh listing
+                        dialogInterface.dismiss();
+                        dialog.dismiss();
+                        listingFragment.refresh();
+                        Snackbar.make(rootView, "Deletion successful", Snackbar.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        final AlertDialog deleteDialog = deleteBuilder.create();
 
         // Setup button click listeners
         playback.setOnClickListener(new View.OnClickListener() {

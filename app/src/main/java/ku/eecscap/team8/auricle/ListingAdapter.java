@@ -19,6 +19,7 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHold
     private ListingHelper[] mDataSet;
     private Context mContext;
     private View rootView;
+    private ListingFragment listingFragment;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvFilename, tvLength, tvDateCreated;
@@ -30,10 +31,11 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHold
         }
     }
 
-    public ListingAdapter(ListingHelper[] dataSet, Context ctx, View view) {
+    public ListingAdapter(ListingHelper[] dataSet, Context ctx, View view, ListingFragment fragment) {
         mDataSet = dataSet;
         mContext = ctx;
         rootView = view;
+        listingFragment = fragment;
     }
 
     @Override
@@ -57,7 +59,7 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ViewHold
             public void onClick(View view) {
                 String path = mContext.getFilesDir().getAbsolutePath();
                 ListingControls controls = new ListingControls(mContext);
-                controls.show(rootView, listingId, path, fullFile, dateCreated, length);
+                controls.show(rootView, listingFragment, listingId, path, fullFile, dateCreated, length);
             }
         });
 
