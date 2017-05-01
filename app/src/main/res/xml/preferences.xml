@@ -1,33 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:key="pref_cat_general"
         android:title="@string/preference_category_general">
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:key="pref_cat_general"
-        android:title="@string/preference_category_data">
         <ListPreference
-            android:key="pref_data_buffer_length"
-            android:title="@string/preference_data_buffer_length"
+            android:summary="%s"
+            android:key="buffer_length"
+            android:title="@string/preference_data_buffer_length_title"
             android:dialogTitle="@string/preference_data_buffer_length_dialog"
             android:entries="@array/preference_data_buffer_length_names"
             android:entryValues="@array/preference_data_buffer_length_values"
-            android:defaultValue="thirty_min"/>
+            android:defaultValue="30"/>
         <ListPreference
-            android:key="pref_data_audio_format"
-            android:title="@string/preference_data_audio_format"
+            android:summary="%s"
+            android:key="audio_format"
+            android:title="@string/preference_data_audio_format_title"
             android:dialogTitle="@string/preference_data_audio_format_dialog"
             android:entries="@array/preference_data_audio_format_names"
             android:entryValues="@array/preference_data_audio_format_values"
-            android:defaultValue="wav"/>
+            android:defaultValue=".m4a"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/preference_category_audio_features">
         <SwitchPreference
-            android:key="pref_data_voice_text"
-            android:title="@string/preference_data_voice_text"
-            android:defaultValue="false"/>
+            android:key="use_aec"
+            android:title="@string/preference_aec_title"
+            android:defaultValue="true"/>
+        <SwitchPreference
+            android:key="use_ns"
+            android:title="@string/preference_ns_title"
+            android:defaultValue="true"/>
+        <SwitchPreference
+            android:key="use_agc"
+            android:title="@string/preference_agc_title"
+            android:defaultValue="true"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

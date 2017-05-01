@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+<string name="accept">Accept</string>
+<string name="eula_string">COPYRIGHTS:
+
+\nCopyright 2017 Auricle. All Rights Reserved.
+
+\n\nTERMS and CONDITIONS:
+
+\n\nLICENSED APPLICATION END USER LICENSE AGREEMENT
+
+\n\nThe Products transacted through the Service are licensed, not sold, to You for use only under
+    the terms of this license, unless a Product is accompanied by a separate license agreement, in which
+    case the terms of that separate agreement will govern, subject to Your prior acceptance of that
+    separate license agreement. The licensor ("Application Provider") reserves all rights not expressly
+    granted to You. The Project that is subject to this license is referred to in this license as the
+    "Licensed Application." If user is found in violation of Terms and Conditions provided by Auricle
+    and its services, then Auricle and its affiliate partners and third parties have permission from user
+    to remove user\'s account(s) and delete user\'s content that was created through Auricle and its Services.
+
+\n\nINTELLECTUAL PROPERTY
+
+\n\nYou agree that Auricle, including but not limited to Auricle projects, graphics, user interface,
+    audio clips, editorial content, and the scripts and software used to implement Auricle, contains
+    proprietary information and material that is owned by Auricle and/or its licensor(s), and is protected
+    by applicable intellectual property and other laws, including but not limited to copyright. You
+    agree that you will not use such proprietary information or materials in any way whatsoever except
+    for use of Auricle in compliance with this Agreement. No portion of Auricle may be reproduced in
+    any form or by any means, except as expressly permitted in these terms. You agree not to modify,
+    rent, lease, loan, sell, distribute, or create derivative works based on Auricle in any manner,
+    and you shall not exploit Auricle in any unauthorized way whatsoever, including, but not limited
+    to, by trespass or burdening network capacity.
+
+\n\nYOUR CONTENT
+\n\nOwnership: You retain all rights and ownership in your content. Auricle does not claim any ownership
+    rights in your content.
+
+    License to Your Content: Even though we do not claim ownership of your content, we do need certain
+    licenses to your content in order to operate and enable the Services. We need your permission to do
+    things. Our Services also provide you features that may require our systems to access, store, and
+    scan Your Stuff. You give us permission to do those things, and this permission extends to our
+    affiliates and trusted third parties we work with.
+
+
+\n\nThis license agreement shall be governed by the laws of The United States of America, Kansas and
+shall inure to the benefit of Auricle or its assigns.
+
+\n\nDISCLAIMER / LIMITATION OF LIABILITY:
+\n\nBuyer acknowledges that the software may not be free from defects and may not satisfy all of buyer\'s
+needs. Auricle warrants all media on which the software is distributed for 60 days to be free from defects
+in normal use. The software and any accompanying written materials are licensed \"AS IS\". Buyer\'s exclusive
+remedy during the warranty period (if any) shall consist of replacement of distribution media if determined to be
+faulty. In no event will Auricle be liable for direct, indirect, incidental or consequential damage or
+damages resulting from loss of use, or loss of anticipated profits resulting from any defect in the software,
+even if it has been advised of the possibility of such damage. Some laws do not allow exclusion or limitation
+of implied warranties or liabilities for incidental or consequential damages, so the above limitations or
+exclusion may not apply. Recordings made through Auricle Services cannot be used in court litigation in small, local,
+federal courts for civil suits, civil lawsuits, local or federal lawsuits, and local or federal
+settlements. Auricle and its affiliate partners and third parties are not held liable for any ongoing and/or
+foreseeable court actions, litigation, testimonies, and damages pertaining to but not limited to civil lawsuits,
+settlements, and other forms of litigation. Auricle is not held liable if user records and/or edits content
+without the permission(s) of other parties within the recording pertaining to and not limited to states that require
+all party-consent or one-party consent.
+
+\n\nPRIVACY POLICY:
+\n\nThis policy ensures that user\'s recordings are protected when fundamentally first created. However,
+    Auricle is not held liable if You, as the user, take recording and publish it in a public forum that the user
+    did not receive permissions from other parties that were recorded in audio clips and used for user\'s self-interest(s).
+    Per DISCLAIMER mentioned above, Auricle is not held liable for any damages.
+
+\n\nSPECIFIC RESTRICTIONS:
+\n\nIn accordance with the COMPUTER SOFTWARE RENTAL ACT OF 1990, this software may not be rented, lent or leased.
+\n\nThe software and accompanying documentation may not be provided by a \"Backup Service\" or any other vendor
+which does not provide an original package as composed of Auricle, including but not limited to all original
+distribution media, documentation, registration cards, and insertions.
+
+\n\nBy clicking on I Agree, I hereby:
+
+\n\nAgree and consent to the User Agreement, its policies, and the Privacy Policy.
+    Expressly instruct Auricle to communicate specific information about me and my account to third
+    parties in accordance with the Privacy Policy.</string>
+</resources>

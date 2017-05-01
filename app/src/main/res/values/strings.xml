@@ -10,12 +10,30 @@
     <string name="record_start_message">Now recording</string>
     <string name="record_stop_message">Recording paused</string>
 
+    <!-- Dialogs -->
+    <string name="post_record_dialog_title">Save clip</string>
+    <string name="post_record_filename">Filename</string>
+    <string name="post_record_slice_clip">Slice clip</string>
+    <string name="save">Save</string>
+    <string name="default_text">Default</string>
+    <string name="close">Close</string>
+
+    <string name="wait_message">Saving audio</string>
+    <string name="wait_warning">This may take a while&#x2026;</string>
+
     <!-- Preferences -->
     <string name="preference_category_general">General</string>
-    <string name="preference_category_data">Data</string>
-    <string name="preference_data_buffer_length">Buffer length</string>
+    <string name="preference_category_audio_features">Audio Features</string>
+    <string name="preference_data_buffer_length_title">Buffer length</string>
     <string name="preference_data_buffer_length_dialog">Select a length</string>
-    <string name="preference_data_audio_format">Audio format</string>
+    <string name="preference_data_audio_format_title">Audio format</string>
     <string name="preference_data_audio_format_dialog">Select a format</string>
-    <string name="preference_data_voice_text">Voice to text</string>
+    <string name="preference_aec_title">Acoustic Echo Cancellation</string>
+    <string name="preference_ns_title">Noise Suppression</string>
+    <string name="preference_agc_title">Automatic Gain Control</string>
+
+    <!-- Other -->
+    <string name="appUri">market://details?id=ku.eecscap.team8.auricle</string>
+    <string name="mrbUri">https://github.com/oli107/material-range-bar</string>
+    <string name="about_page_description">Auricle offers constant audio recording for everyday use. Designed specifically with forgetful people in mind, Auricle constantly records up to the previous two hours of audio in the background. After saving the audio, users have the ability to play, delete or export their audio files.\n\nFeatures:\n- Background audio recording\n- Adjustable buffer size\n- Multiple save formats\n- Optional recording improvements\n- Privacy</string>
 </resources>

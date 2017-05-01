@@ -1,11 +1,8 @@
-package team8.eecscap.ku.auricle;
+package ku.eecscap.team8.auricle;
 
 /**
- * Created by tnguyen on 2/12/17.
+ * Created by thngu on 3/8/2017.
  */
-
-//package com.app.db;
-//import com.app.sample.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,11 +14,13 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 
-public class ToA {
+
+public class AgreeTerms {
+
     private String EULA_PREFIX = "appeula";
     private Activity mContext;
 
-    public ToA(Activity context) {
+    public AgreeTerms(Activity context) {
         mContext = context;
     }
 
@@ -49,7 +48,7 @@ public class ToA {
         if (bAlreadyAccepted == false) {
 
             // EULA title
-            String title = mContext.getString(R.string.app_name) + "_v"
+            String title = "Auricle" + "_v"
                     + versionInfo.versionName;
 
             // EULA text
