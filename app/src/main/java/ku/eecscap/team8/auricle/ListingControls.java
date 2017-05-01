@@ -93,7 +93,7 @@ public class ListingControls {
         // Build delete dialog
         AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(mContext)
                 .setTitle("Confirm delete")
-                .setMessage("Are you sure you want to delete " + filename + "? This is an a permanent action and cannot be undone.")
+                .setMessage("Are you sure you want to delete " + filename + "? This is a permanent action and cannot be undone.")
                 .setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
