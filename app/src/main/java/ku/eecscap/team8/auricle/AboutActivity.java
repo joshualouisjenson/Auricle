@@ -11,13 +11,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
-
-import mehdi.sakout.aboutpage.AboutPage;
-import mehdi.sakout.aboutpage.Element;
+import android.widget.TextView;
 
 /**
  * Created by Austin Kurtti on 4/18/2017.
- * Last Edited by Austin Kurtti on 4/26/2017
+ * Last Edited by Austin Kurtti on 4/30/2017
  */
 
 public class AboutActivity extends AppCompatActivity {
@@ -36,27 +34,39 @@ public class AboutActivity extends AppCompatActivity {
             }
         });
 
-        // Get app version
-        Element versionEl = new Element();
-        String versionName = "";
+        // Get about elements
+        LinearLayout rateUs = (LinearLayout) findViewById(R.id.about_rate_us);
+        TextView reviewEULA = (TextView) findViewById(R.id.about_review_eula);
+        TextView version = (TextView) findViewById(R.id.about_version);
+        TextView mrbCredit = (TextView) findViewById(R.id.about_credit_mrb);
+
+        // Get version
+        String versionText = "unavailable";
         try {
-            versionName = this.getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            versionText = this.getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         }
         catch(PackageManager.NameNotFoundException e) {
             Log.e("VersionNameNotFound", e.getMessage());
         }
-        versionEl.setTitle("Version " + versionName);
+        versionText = "Version " + versionText;
+        version.setText(versionText);
 
-        // EULA element
-        Element eulaEl = new Element();
-        eulaEl.setTitle("Review EULA");
-        eulaEl.setOnClickListener(new View.OnClickListener() {
+        // Set element click listeners
+        rateUs.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext())
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(getString(R.string.appUri)));
+                startActivity(intent);
+            }
+        });
+        reviewEULA.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext())
                         .setTitle("EULA")
                         .setMessage(R.string.eula_string)
-                        .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
+                        .setPositiveButton("CLOSE", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
@@ -65,30 +75,13 @@ public class AboutActivity extends AppCompatActivity {
                 builder.create().show();
             }
         });
-
-        // Configure credit elements
-        Element creditEl1 = new Element();
-        creditEl1.setTitle("MaterialRangeBar");
-        Intent credit1Intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.mrbUri)));
-        creditEl1.setIntent(credit1Intent);
-        Element creditEl2 = new Element();
-        creditEl2.setTitle("Android About Page");
-        Intent credit2Intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.aapUri)));
-        creditEl2.setIntent(credit2Intent);
-
-        // Create about page
-        View aboutPage = new AboutPage(this)
-                .isRTL(false)
-                .setImage(R.mipmap.ic_launcher)
-                .setDescription("Auricle description goes here.")
-                .addItem(versionEl)
-                .addItem(eulaEl)
-                .addGroup("Credits")
-                .addItem(creditEl1)
-                .addItem(creditEl2)
-                .create();
-
-        LinearLayout target = (LinearLayout) findViewById(R.id.content_about_target);
-        target.addView(aboutPage);
+        mrbCredit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(getString(R.string.mrbUri)));
+                startActivity(intent);
+            }
+        });
     }
 }
